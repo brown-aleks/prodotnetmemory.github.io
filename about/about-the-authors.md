@@ -7,7 +7,7 @@
 ***Кевин Госс*** - использовал технологии Microsoft .NET с самых первых дней, в клиентских, серверных и мобильных приложениях. Он является Microsoft MVP и в настоящее время работает в Datadog, где он работает над производительностью .NET APM. Он пишет глубокие технические статьи в своем личном блоге (minidump.net) и активен в Twitter под псевдонимом @kookiz.</p>
 
 ---
-- [Оглавление](../index.html)  
+- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io)  
 - [О техническом рецензенте](../about/about-the-technical-reviewer.md)  
 - [Благодарности](../about/acknowledgments.md)  
 - [Предисловие](../about/foreword.md)  

@@ -23,7 +23,7 @@
 <p align="right"><b>Маони Стивенс Июль 2018</b></p>
 
 ---
-- [Оглавление](../index.html)  
+- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io)  
 - [Об авторах](../about/about-the-authors.md)  
 - [О техническом рецензенте](../about/about-the-technical-reviewer.md)  
 - [Благодарности](../about/acknowledgments.md)  
