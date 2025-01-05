@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Навигация</title>
+    <link rel="stylesheet" href="styles.css">
+	<script src="scripts.js" defer></script>
+</head>
+<body>
+    <nav>
+        <ul>
+            <li><a href="#introduction" onclick="loadPage('about/introduction.html')">Введение</a></li>
+            <li>
+                <a href="#сhapter-1" onclick="toggleMenu(this); loadPage('chapter-1/basic-concepts.html')">Глава 1</a>
+                <ul>
+                    <li><a href="#basic-concepts" onclick="loadPage('chapter-1/basic-concepts.html')">Основные понятия</a></li>
+                    <li><a href="#memory-related-terms" onclick="loadPage('chapter-1/memory-related-terms.html')">Термины, связанные с памятью</a></li>
+                </ul>
+            </li>
+            <li><a href="#chapter-2" ondblclick="loadPage('chapter-2/low-level-memory-management')">Глава 2</a></li>
+        </ul>
+    </nav>
+</body>
+</html>
