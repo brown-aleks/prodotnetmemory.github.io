@@ -9,15 +9,15 @@
 <body>
     <nav>
         <ul>
-            <li><a href="#introduction" onclick="loadPage('about/introduction.html')">Введение</a></li>
+            <li><a href="about/introduction.html" target="content-frame">Введение</a></li>
             <li>
-                <a href="#сhapter-1" onclick="toggleMenu(this); loadPage('chapter-1/basic-concepts.html')">Глава 1</a>
+                <a href="chapter-1/basic-concepts.html" target="content-frame" onclick="toggleMenu(this);">Глава 1</a>
                 <ul>
-                    <li><a href="#basic-concepts" onclick="loadPage('chapter-1/basic-concepts.html')">Основные понятия</a></li>
-                    <li><a href="#memory-related-terms" onclick="loadPage('chapter-1/memory-related-terms.html')">Термины, связанные с памятью</a></li>
+                    <li><a href="chapter-1/basic-concepts.html" target="content-frame">Основные понятия</a></li>
+                    <li><a href="chapter-1/memory-related-terms.html" target="content-frame">Термины, связанные с памятью</a></li>
                 </ul>
             </li>
-            <li><a href="#chapter-2" ondblclick="loadPage('chapter-2/low-level-memory-management')">Глава 2</a></li>
+            <li><a href="chapter-2/low-level-memory-management.html" target="content-frame">Глава 2</a></li>
         </ul>
     </nav>
 </body>
