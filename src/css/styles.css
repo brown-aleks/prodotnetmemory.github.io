@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f9fa;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    color: #343a40;
+}
+
+.container {
+    margin-top: 20px;
+}
+
+.btn-custom {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-custom:hover {
+    background-color: #0056b3;
+}
+
+.card {
+    margin-bottom: 20px;
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    background-color: #343a40;
+    color: white;
+}
+
+.nav ul {
+    list-style-type: none; /* Убирает маркеры списка */
+    padding-left: 1rem; /* Убирает отступы слева */
+}
+
+.nav-item {
+    /*background-color: aqua;*/
+    margin: 0.25rem 0;
+}
+
+.nav-link {
+    /*background-color: cadetblue;*/
+    padding: 0.25rem 0.5rem;
+    margin: 0;
+    border-radius: 0.25rem;
+}
+
+.nav-link:hover {
+    background-color: #e9ecef;
+}
+
+.nav-link.active {
+    background-color: #007bff;
+    color: white;
+}
+
+#navbar {
+    top: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+}
