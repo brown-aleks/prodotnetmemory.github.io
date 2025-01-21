@@ -153,7 +153,7 @@
 Также есть огромное количество знаний из различных онлайн-блогов и статей. Но вместо того, чтобы заваливать эти страницы их списком, позвольте мне просто перенаправить вас на отличный https://github.com/adamsitnik/awesome-dot-net-performance репозиторий, поддерживаемый Адамом Ситником.
 
 ---
-- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io)  
+- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io/src)  
 - [Об авторах](../about/about-the-authors.md)  
 - [О техническом рецензенте](../about/about-the-technical-reviewer.md)  
 - [Благодарности](../about/acknowledgments.md)  
