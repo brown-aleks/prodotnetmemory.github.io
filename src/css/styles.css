@@ -9,6 +9,31 @@ h1, h2, h3, h4, h5, h6 {
     color: #343a40;
 }
 
+p {
+    margin: 2px 0px;
+    text-indent: 2em;
+}
+
+p.right-style {
+    text-align: right;
+}
+
+p.center-style {
+    text-align: center;
+}
+
+p.left-style {
+    text-align: left;
+}
+
+.note {
+    border: 1px solid black;
+    padding: 10px;
+    margin: 10px 0;
+    background-color: #f9f9f9;
+}
+
+
 .container {
     margin-top: 20px;
 }
