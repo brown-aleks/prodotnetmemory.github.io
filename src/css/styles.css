@@ -58,14 +58,37 @@ p.left-style {
     color: white;
 }
 
+.list {
+    list-style-type: none;
+    border: 1px solid #dee2e6;
+    border-radius: 0;
+}
+
 .nav ul {
     list-style-type: none; /* Убирает маркеры списка */
     padding-left: 1rem; /* Убирает отступы слева */
+
 }
 
 .nav-item {
-    /*background-color: aqua;*/
     margin: 0.25rem 0;
+    line-height: 1;
+}
+
+.nav-item-1 {
+    font-size: 1.2rem;
+    font-weight: 700;
+}
+
+.nav-item-2 {
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.nav-item-3 {
+    font-size: 0.9rem;
+    font-weight: 300;
+    font-style: italic;
 }
 
 .nav-link {
