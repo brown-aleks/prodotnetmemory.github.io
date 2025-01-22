@@ -79,9 +79,10 @@ function loadOffcanvasNavbar() {
       });
 }
 
+
 // Загрузка навигационной панели при загрузке страницы
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function () {
   loadNavbar();
   loadOffcanvasNavbar();
-  loadContent('home.html', 'home-intro');
+  loadContent('chapter1.html', 'chapter1-6-1');
 });
