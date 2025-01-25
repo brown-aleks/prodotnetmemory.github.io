@@ -1,3 +1,5 @@
+@import url(list.css);
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f8f9fa;
@@ -10,8 +12,8 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p {
-    margin: 2px 0px;
-    text-indent: 2em;
+    margin: 0.5rem 0px;
+    text-indent: 2rem;
 }
 
 p.right-style {
@@ -58,57 +60,8 @@ p.left-style {
     color: white;
 }
 
-.list {
-    list-style-type: none;
-    border: 1px solid #dee2e6;
-    border-radius: 0;
-}
 
-.nav ul {
-    list-style-type: none; /* Убирает маркеры списка */
-    padding-left: 1rem; /* Убирает отступы слева */
 
-}
 
-.nav-item {
-    margin: 0.25rem 0;
-    line-height: 1;
-}
 
-.nav-item-1 {
-    font-size: 1.2rem;
-    font-weight: 700;
-}
 
-.nav-item-2 {
-    font-size: 1rem;
-    font-weight: 500;
-}
-
-.nav-item-3 {
-    font-size: 0.9rem;
-    font-weight: 300;
-    font-style: italic;
-}
-
-.nav-link {
-    /*background-color: cadetblue;*/
-    padding: 0.25rem 0.5rem;
-    margin: 0;
-    border-radius: 0.25rem;
-}
-
-.nav-link:hover {
-    background-color: #e9ecef;
-}
-
-.nav-link.active {
-    background-color: #007bff;
-    color: white;
-}
-
-#navbar {
-    top: 0;
-    max-height: 100vh;
-    overflow-y: auto;
-}
