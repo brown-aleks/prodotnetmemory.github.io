@@ -28,6 +28,10 @@ p.left-style {
     text-align: left;
 }
 
+p.justify-style {
+    text-align: justify;
+}
+
 .note {
     border: 1px solid black;
     padding: 10px;
