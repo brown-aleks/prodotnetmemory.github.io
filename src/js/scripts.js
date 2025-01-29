@@ -84,5 +84,5 @@ function loadOffcanvasNavbar() {
 document.addEventListener('DOMContentLoaded', function () {
   loadNavbar();
   loadOffcanvasNavbar();
-  loadContent('chapter1.html', 'chapter1-6-1');
+  loadContent('home.html', 'home-intro');
 });
