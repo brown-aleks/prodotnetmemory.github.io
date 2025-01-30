@@ -7,6 +7,33 @@ body {
     padding: 0;
 }
 
+header {
+    height: 60px;
+    background-color: #f8f9fa;
+}
+
+/* main {
+
+} */
+
+footer {
+    background-color: #f8f9fa;
+    color: white;
+    text-align: center;
+    padding: 10px;
+
+    height: 60px;
+}
+
+#navbar {
+    background-color: #f8f9fa;
+    color: white;
+    display: flex;
+    max-width: 350px;
+    justify-content: space-between;
+    padding: 10px;
+}
+
 h1, h2, h3, h4, h5, h6 {
     color: #343a40;
 }
@@ -56,16 +83,3 @@ p.justify-style {
 .card {
     margin-bottom: 20px;
 }
-
-.footer {
-    text-align: center;
-    padding: 20px;
-    background-color: #343a40;
-    color: white;
-}
-
-
-
-
-
-
