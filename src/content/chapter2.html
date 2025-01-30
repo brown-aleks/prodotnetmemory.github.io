@@ -1,2 +1,150 @@
-<h2 id="section-chapter2">Глава 2</h2>
-<p>Информация о второй главе.</p>
+<h2 id="chapter2" class="h2 p-2">Глава 2: Низкоуровневое управление памятью</h2>
+
+<hr class="border-2">
+
+<p class="justify-style">В предыдущей главе вы узнали теоретические основы управления памятью. Теперь вы можете сразу перейти к деталям автоматического управления памятью, как работает сборщик мусора и где могут возникать утечки памяти. Но если вы действительно хотите «освоить» эту тему, стоит потратить еще немного времени на низкоуровневые аспекты управления памятью. Это позволит вам лучше понять различные проектные решения, которые были приняты создателями сборщика мусора в .NET (а также других управляемых сред выполнения). Создатели таких механизмов не живут в вакууме и должны адаптироваться к ограничениям и механизмам, которые управляют компьютерным оборудованием и операционными системами.</p>
+
+<p class="justify-style">Вы узнаете о этих механизмах и ограничениях в этой главе. Честно говоря, не так просто представить такие темы в не перегружающей форме. К сожалению, управление памятью в .NET было бы неполным без углубления в эти детали.</p>
+
+<p class="justify-style">Хотя оператор «new» достаточен для большинства сценариев управления памятью в .NET, более глубокое понимание основных процессов и механизмов может оказаться полезным. Оборудование, операционная система и компилятор влияют на то, как это работает и как был написан .NET, хотя это не всегда очевидно. Эти знания очень согласуются с духом Механической Симпатии, представленной в предыдущей главе. Мы надеемся, что вам также будет просто интересно узнать некоторые из упомянутых здесь мелких фактов.</p>
+
+<p class="justify-style">Еще раз, если вы торопитесь или просто хотите перейти к более практическим внутренним аспектам .NET и примерам, не стесняйтесь просмотреть эту главу и вернуться к ней в более свободное время, надеемся.</p>
+
+<hr class="border-2">
+<p id="chapter2-1" class="h3 p-2">Аппаратное обеспечение</p>
+
+<p class="justify-style"> Как работает современный компьютер? Вы, вероятно, уже имеете базовое представление о предмете: компьютер состоит из процессора, который является основной вычислительной единицей – он выполняет программы. У него есть доступ к оперативной памяти (которая быстрая) и жестким дискам (которые медленные). Также есть видеокарта, которая очень важна для геймеров (и различных видов графических дизайнеров), которая отвечает за создание изображения, отображаемого на мониторе. Такой обзор с высоты птичьего полета недостаточен для наших целей. Давайте углубимся в тему. Для целей ваших размышлений давайте введем архитектуру современного компьютера, как на диаграмме на <a href="#f-2-1">Рисунке 2-1</a>.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Современный рынок персональных компьютеров доминируют ПК и Маки. Смоделированная схема архитектуры общего компьютера основана на них. При необходимости будут введены некоторые возможные нюансы, такие как те, которые касаются процессоров ARM или более сложных серверных машин.</p>
+  </div>
+</div>
+
+<p class="justify-style">Основные компоненты типичной архитектуры компьютера можно перечислить как</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Процессор</span> (CPU, центральный процессор): Основной блок, отвечающий за выполнение инструкций, как описано в Главе 1. Здесь находятся такие компоненты, как арифметико-логические устройства (ALU), устройства с плавающей запятой (FPU), регистры и конвейеры выполнения инструкций, которые делят инструкции на набор более мелких операций и выполняют их, если возможно, параллельно.</p>
+    </li>
+    <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Шина передней панели</span> (FSB): Шина данных, соединяющая процессор с северным мостом.</p>
+    </li>
+    <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Северный мост</span>: Блок, содержащий в основном контроллер памяти, отвечающий за управление связью между памятью и процессором.</p>
+    </li>
+    <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">ОЗУ</span> (оперативная память): Основная память компьютера. Она хранит данные и код программ до тех пор, пока питание включено – поэтому ее также называют динамической оперативной памятью (DRAM) или энергозависимой памятью.</p>
+    </li>
+    <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Шина памяти</span>: Шина данных, соединяющая ОЗУ с северным мостом.</p>
+    </li>
+    <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Южный мост</span>: Чип, который обрабатывает все функции ввода-вывода, такие как USB, аудио, последовательный порт, системный BIOS, шина ISA, контроллер прерываний и каналы IDE – контроллеры массового хранения, такие как PATA и/или SATA.</p>
+    </li>
+    <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Ввод-вывод хранения</span>: Энергонезависимая память, которая хранит данные, включая популярные HDD или SSD диски.</p>
+  </li>
+</ul>
+
+<figure id="f-2-1" class="figure">
+  <img src="content/img/2-1.png" class="img-fluid" alt="Рисунок 2-1" max-width="600">
+  <figcaption class="figure-caption">Рисунок 2-1. Архитектура компьютера – ЦПУ, ОЗУ, северный мост, южный мост и другие. Ширина шины иллюстрирует пропорцию объема передаваемых данных (очень приблизительно)</figcaption>
+</figure>
+
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-1-1" class="h4 p-2">Memory</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-1-2" class="h4 p-2">CPU</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2" class="h3 p-2">Operating System</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-1" class="h4 p-2">Virtual Memory</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-2" class="h4 p-2">Large Pages</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-3" class="h4 p-2">Virtual Memory Fragmentation</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-4" class="h4 p-2">General Memory Layout</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-5" class="h4 p-2">Windows Memory Management</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-6" class="h4 p-2">Windows Memory Layout</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-7" class="h4 p-2">Linux Memory Management</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-2-8" class="h4 p-2">Linux Memory Layout</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="capter2-2-9" class="h4 p-2">Operating System Influence</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-3" class="h3 p-2">NUMA and CPU Groups</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-4" class="h3 p-2">Summary</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-4-1" class="h4 p-2">Rule 2 - Random Access Should Be Avoided, Sequential Access Should Be Encouraged</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-4-2" class="h4 p-2">Rule 3 - Improve Spatial and Temporal Data Locality</p>
+<p class="justify-style">Текст...</p>
+
+<hr class="border-2">
+<p id="chapter2-4-3" class="h4 p-2">Rule 4 - Consider More Advanced Possibilities</p>
+<p class="justify-style">Текст...</p>
+
+
+<!--
+Chapter 2: Low-Level Memory Management
+  Hardware
+    Memory
+    CPU
+  Operating System
+    Virtual Memory
+    Large Pages
+    Virtual Memory Fragmentation
+    General Memory Layout
+    Windows Memory Management
+    Windows Memory Layout
+    Linux Memory Management
+    Linux Memory Layout
+    Operating System Influence
+  NUMA and CPU Groups
+  Summary
+    Rule 2 - Random Access Should Be Avoided, Sequential Access Should Be Encouraged
+    Rule 3 - Improve Spatial and Temporal Data Locality
+    Rule 4 - Consider More Advanced Possibilities
+-->
+    
+    
