@@ -28,23 +28,23 @@
 <ul class="bullet-list ms-1">
   <li>
     <p class="justify-style"><span class="fw-bold fst-italic">Процессор</span> (CPU, центральный процессор): Основной блок, отвечающий за выполнение инструкций, как описано в Главе 1. Здесь находятся такие компоненты, как арифметико-логические устройства (ALU), устройства с плавающей запятой (FPU), регистры и конвейеры выполнения инструкций, которые делят инструкции на набор более мелких операций и выполняют их, если возможно, параллельно.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style"><span class="fw-bold fst-italic">Шина передней панели</span> (FSB): Шина данных, соединяющая процессор с северным мостом.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style"><span class="fw-bold fst-italic">Северный мост</span>: Блок, содержащий в основном контроллер памяти, отвечающий за управление связью между памятью и процессором.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style"><span class="fw-bold fst-italic">ОЗУ</span> (оперативная память): Основная память компьютера. Она хранит данные и код программ до тех пор, пока питание включено – поэтому ее также называют динамической оперативной памятью (DRAM) или энергозависимой памятью.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style"><span class="fw-bold fst-italic">Шина памяти</span>: Шина данных, соединяющая ОЗУ с северным мостом.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style"><span class="fw-bold fst-italic">Южный мост</span>: Чип, который обрабатывает все функции ввода-вывода, такие как USB, аудио, последовательный порт, системный BIOS, шина ISA, контроллер прерываний и каналы IDE – контроллеры массового хранения, такие как PATA и/или SATA.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style"><span class="fw-bold fst-italic">Ввод-вывод хранения</span>: Энергонезависимая память, которая хранит данные, включая популярные HDD или SSD диски.</p>
   </li>
 </ul>
@@ -74,10 +74,10 @@
 <ul class="bullet-list ms-1">
   <li>
     <p class="justify-style">Отправка данных из внутренней ячейки памяти дважды в течение одного тактового цикла. Для точности, это как на спаде, так и на подъеме сигнала. Отсюда и название самой популярной памяти различных поколений – <span class="fw-bold fst-italic">Double Data Rate</span> (DDR). Этот метод также называют <span class="fw-bold fst-italic">двойной накачкой</span>.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style">Использование внутренней буферизации для выполнения нескольких чтений одновременно («режим burst») в одном тактовом цикле памяти. Это умножает количество прочитанных данных при той же внутренней частоте. Интерфейс памяти DDR2 удваивает внешнюю тактовую частоту, в то время как DDR3 и DDR4 увеличивают ее в четыре раза. DDR5 удваивает ее еще раз.</p>
-    </li>
+  </li>
 </ul>
 
 <p class="justify-style">Эти методы в настоящее время используются в модулях DDR в отличие от гораздо более простых модулей SDRAM (синхронный DRAM), использовавшихся в прошлом. В конечном итоге, в случае современных типичных DDR5, кратность «burst» модуля памяти составляет 16, поскольку он сочетает технику двойной накачки с восемью чтениями одновременно.</p>
@@ -287,7 +287,7 @@
       int[,] tab = new int[n, m];
       for (int i = 0; i &lt; n; ++i)
       {
-        for (int j = 0; j < m; ++j)
+        for (int j = 0; j &lt; m; ++j)
         {
           tab[i, j] = 1;
         }
@@ -295,9 +295,9 @@
 
       // По столбцам
       int[,] tab = new int[n, m];
-      for (int i = 0; i < n; ++i)
+      for (int i = 0; i &lt; n; ++i)
       {
-        for (int j = 0; j < m; ++j)
+        for (int j = 0; j &lt; m; ++j)
         {
           tab[j, i] = 1;
         }
@@ -333,7 +333,6 @@
         <td>413 ms</td>
         <td>2001 ms</td>
       </tr>
-      
     </tbody>
   </table>
   <figcaption class="figure-caption">Таблица 2-1. Результаты индексации по столбцам и строкам (n,m = 5000)</figcaption>
@@ -346,11 +345,11 @@
 <ul class="bullet-list ms-1">
   <li>
     <p class="justify-style">Чтобы прочитать первые четыре элемента (1,2,3,4), считывается первая строка кэша, и все эти элементы используются.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style">Чтобы прочитать следующие четыре элемента (5,6,7,8), считывается вторая строка кэша, и снова все эти элементы используются.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style">Чтобы прочитать следующие четыре элемента (9,10,11,12), считывается третья строка кэша. Этот доступ повторяется по всему массиву, и использование строк кэша является оптимальным.</p>
   </li>
 </ul>
@@ -368,14 +367,14 @@
 <ul class="bullet-list ms-1">
   <li>
     <p class="justify-style">Чтобы прочитать первые четыре элемента, считываются четыре строки кэша, но используется только один элемент из каждой из них (1 из первой строки кэша, 9 из второй и так далее).</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style">Чтобы прочитать следующий элемент (33), одна из уже загруженных строк кэша должна быть очищена, потому что буфер уже заполнен. Скорее всего, это будет наименее используемая строка (содержащая элементы 1,2,3,4) и заменена на новую (содержащую 33,34,35,36).</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style">Чтобы прочитать следующий элемент (2), снова будет очищена наименее используемая строка, и процессору потребуется перезагрузить первую строку (содержащую 1,2,3,4), выгруженную только что.</p>
-    </li>
-    <li>
+  </li>
+  <li>
     <p class="justify-style">Этот шаблон доступа повторяется много раз, требуя считывания строки кэша четыре раза.</p>
   </li>
 </ul>
@@ -458,6 +457,7 @@
     <li>
     <p class="justify-style">Вы можете найти первый выровненный адрес в массиве и начать обработку с него. Остальное следует обрабатывать без использования не временного, не выровненного API.</p>
   </li>
+</ul>
 
 <p class="justify-style"> В общем, вы должны понимать, что использование не временного доступа - это сложная и хитрая вещь. Это определенно не должно использоваться в качестве стандартной "быстрой техники доступа к памяти".</p>
 
@@ -532,7 +532,137 @@
 
 <p class="h5 p-2">Иерархический кэш</p>
 
-<p class="justify-style">Текст...</p>
+<p class="justify-style">Возвращаясь к архитектуре оборудования, из-за требований к производительности, с одной стороны, и оптимизации затрат, с другой, дизайн ЦПУ сегодня эволюционировал в более сложную иерархическую кэш-память. Идея проста. Вместо одного кэша давайте создадим несколько, с разными размерами и скоростями. Это позволяет создать очень маленький и очень быстрый кэш первого уровня (называемый L1), затем немного больший и немного медленнее кэш второго уровня (L2), и, наконец, кэш третьего уровня (L3). В современной архитектуре эта нумерация заканчивается на трех уровнях. Такая иерархическая кэш-память современных компьютеров показана на <a href="#f-2-10">Рисунке 2-10</a>. Правда, иногда можно встретить процессоры, оснащенные кэшем L4, но это немного другой вид памяти, предназначенный в основном для интегрированных графических карт внутри этих ЦПУ.</p>
+
+<figure id="f-2-10" class="figure">
+  <img src="content/img/2-10.png" class="img-fluid" alt="Рисунок 2-10" max-width="600">
+  <figcaption class="figure-caption">Рисунок 2-10. ЦПУ с иерархическим кэшем – кэш первого уровня разделен на кэш инструкций (L1i) и кэш данных (L1d), а также кэш второго (L2) и третьего (L3) уровней. ЦПУ подключен к ОЗУ через шину памяти</figcaption>
+</figure>
+
+<p class="justify-style">Кэш первого уровня разделен на два отдельных блока. Один предназначен для данных (обозначен как L1d), а другой для инструкций (обозначен как L1i). Инструкции, считываемые из памяти и выполняемые процессором, также фактически являются данными, но интерпретируются соответствующим образом. Данные и инструкции кода на уровнях выше L1 фактически обрабатываются одинаково. Однако практика показала, что предпочтительнее обрабатывать данные и инструкции отдельно для самого нижнего уровня кэша. Это подход архитектуры Гарварда. По этой причине архитектура современных компьютеров называется <span class="fw-bold fst-italic">модифицированной Гарвардской архитектурой</span>. Это решение хорошо работает из-за сильной независимости использования областей памяти для хранения данных и программного кода, но только на самом нижнем уровне.</p>
+
+<p class="justify-style">Зная, что существует три основных уровня кэша, возникает очевидный вопрос: каковы типичные различия в скорости и размере между ними и основной памятью? Память на нижних уровнях кэша может быть очень быстрой, настолько, что доступ к L1 и даже L2 может быть быстрее времени выполнения конвейера (если только вам не нужно ждать точного вычисления адреса, что также является дорогостоящей операцией). Итак, каковы эти временные интервалы?</p>
+
+<p class="justify-style">На момент написания этой главы использовался ноутбук с процессором Intel Core i7-4712MQ (поколение Haswell), работающим на частоте 2,30 ГГц. Предполагая, что один цикл процессора на моем ноутбуке занимает примерно 0,4 нс (~1/2,30 ГГц) и используя спецификацию Haswell i7, задержка доступа к различным уровням памяти может быть представлена, как показано в <a href="#t-2-2">Таблице 2-2</a>.</p>
+
+<figure id="t-2-2" class="figure">
+  <table class="table table-striped table-hover border-1 ">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Операция</th>
+        <th Scope="col">Задержка</th>
+
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+        <th scope="row">1</th>
+        <td>Кэш L1</td>
+        <td> &lt; 2.0 нс</td>
+
+            </tr>
+            <tr>
+        <th scope="row">2</th>
+        <td>Кэш L2</td>
+        <td>4.8 нс</td>
+            </tr>
+            <tr>
+        <th scope="row">3</th>
+        <td>Кэш L3</td>
+        <td>14.4 нс</td>
+            </tr>
+            <tr>
+        <th scope="row">4</th>
+        <td>Основная память</td>
+        <td>71.4 нс</td>
+            </tr>
+            <tr>
+        <th scope="row">5</th>
+        <td>HDD</td>
+        <td>150 000 нс</td>
+            </tr>
+          </tbody>
+        </table>
+        <figcaption class="figure-caption">Таблица 2-2. Задержка доступа к различным частям памяти</figcaption>
+</figure>
+
+<p class="justify-style">You can clearly see it is worth fighting for optimal cache usage. Latency can be as much as five times 
+  faster when the needed data is available in an L3 cache rather than in RAM. With an L1 cache, it is over 30 
+  times better. That is why it is extremely important for the overall performance to know how the cache is used. 
+  How much data fits into the cache? It all depends on the specific CPU model, but the i7-4770K specification 
+  pretty well reflects market standards. L1 cache has 64 KiB of data (split into 32 KiB for code and 32 KiB for 
+  data), while the L2 cache has 256 KiB. The L3 cache, always much bigger, is 8 MiB big.</p>
+
+<p class="justify-style">What is the impact of those timings in the managed world of .NET? Let’s look at the simple example 
+  showing the latency in accessing data depending on the amount of memory being processed. We use the 
+  code from Listing 2-5 that makes a series of sequential readings (optimal case). As the used structure has 
+  a 64 bytes size, the read is done with a 64-byte step and every time a new cache line needs to be loaded. 
+  Figure 2-11 shows the average access times per single element of the tab array, depending on how much 
+  memory this array took in total.</p>
+
+<p class="justify-style">There is a clear deterioration of access time when the data size exceeds the cache size of each level. As 
+  benchmarks were performed on an Intel i7-4770K processor, the clearly visible performance degradation 
+  points are around 256 KiB and 8192 KiB, which correspond to L2 and L3 cache sizes. You can see that 
+  operating on small data sizes may be a few times faster than operating on data that does not fit the L3 cache.</p>
+
+<figure id="l-2-5" class="figure">
+  <pre class="code border border-secondary">
+    <code class="language-csharp">
+      public struct OneLineStruct
+      {
+        public long data1;
+        public long data2;
+        public long data3;
+        public long data4;
+        public long data5;
+        public long data6;
+        public long data7;
+        public long data8;
+      }
+      public static long OneLineStructSequentialReadPattern(OneLineStruct[] tab)
+      {
+        long sum = 0;
+        int n = tab.Length;
+        for (int i = 0; i < n; ++i)
+        {
+          unchecked { sum += tab[i].data1; }
+        }
+        return sum;
+      }
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 2-5. Sequential read of succeeding cache lines</figcaption>
+</figure>
+
+<figure id="f-2-11" class="figure">
+  <img src="content/img/2-11.png" class="img-fluid" alt="Рисунок 2-11" max-width="600">
+  <figcaption class="figure-caption">Рисунок 2-11. Access time depending on the data size – Intel x86 architecture/sequential read. Please note: both 
+    axes are logarithmic</figcaption>
+</figure>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">There is one interesting yet not so important topic in the context of cache – the eviction strategies. 
+      It’s about how you get space for new data if it’s missing at a given level. There are two possible approaches, 
+      sometimes mixed on the different levels:</p>
+    <ul class="bullet-list ms-1">
+      <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Exclusive cache</span>: Data is only on one level of cache. This method is most commonly 
+          used in AMD processors.</p>
+      </li>
+      <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">LInclusive cache</span>: Where each cache line in a lower level (e.g., L1d) is also present in a higher level (e.g., L2).</p>
+      </li>
+    </ul>
+    <p class="card-text justify-style">Although interesting, this does not affect your understanding of memory management. It should be assumed 
+      that CPU manufacturers are doing their best to ensure the most effective implementation of these mechanisms.</p>
+  </div>
+</div>
+
+<p class="h5 p-2">Multicore Hierarchical Cache</p>
 
 <p class="justify-style">Текст...</p>
 
