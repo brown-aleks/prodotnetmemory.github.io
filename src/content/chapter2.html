@@ -587,25 +587,13 @@
         <figcaption class="figure-caption">Таблица 2-2. Задержка доступа к различным частям памяти</figcaption>
 </figure>
 
-<p class="justify-style">You can clearly see it is worth fighting for optimal cache usage. Latency can be as much as five times 
-  faster when the needed data is available in an L3 cache rather than in RAM. With an L1 cache, it is over 30 
-  times better. That is why it is extremely important for the overall performance to know how the cache is used. 
-  How much data fits into the cache? It all depends on the specific CPU model, but the i7-4770K specification 
-  pretty well reflects market standards. L1 cache has 64 KiB of data (split into 32 KiB for code and 32 KiB for 
-  data), while the L2 cache has 256 KiB. The L3 cache, always much bigger, is 8 MiB big.</p>
+<p class="justify-style">Вы можете ясно видеть, что стоит бороться за оптимальное использование кэша. Задержка может быть в пять раз быстрее, когда необходимые данные доступны в кэше L3, а не в оперативной памяти. С кэшем L1 это более чем в 30 раз лучше. Вот почему чрезвычайно важно для общей производительности знать, как используется кэш. Сколько данных помещается в кэш? Все зависит от конкретной модели процессора, но спецификация i7-4770K довольно хорошо отражает рыночные стандарты. Кэш L1 имеет 64 КБ данных (разделенных на 32 КБ для кода и 32 КБ для данных), в то время как кэш L2 имеет 256 КБ. Кэш L3, всегда намного больше, составляет 8 МБ.</p>
 
-<p class="justify-style">What is the impact of those timings in the managed world of .NET? Let’s look at the simple example 
-  showing the latency in accessing data depending on the amount of memory being processed. We use the 
-  code from Listing 2-5 that makes a series of sequential readings (optimal case). As the used structure has 
-  a 64 bytes size, the read is done with a 64-byte step and every time a new cache line needs to be loaded. 
-  Figure 2-11 shows the average access times per single element of the tab array, depending on how much 
-  memory this array took in total.</p>
+<p class="justify-style">Каково влияние этих временных интервалов в управляемом мире .NET? Давайте рассмотрим простой пример, показывающий задержку при доступе к данным в зависимости от объема обрабатываемой памяти. Мы используем код из <a href="#l-2-5">Листинга 2-5</a>, который выполняет серию последовательных чтений (оптимальный случай). Поскольку используемая структура имеет размер 64 байта, чтение выполняется с шагом 64 байта, и каждый раз необходимо загружать новую строку кэша. На <a href="#f-2-11">Рисунке 2-11</a> показаны средние времена доступа к одному элементу массива tab в зависимости от того, сколько памяти этот массив занимал в целом.</p>
 
-<p class="justify-style">There is a clear deterioration of access time when the data size exceeds the cache size of each level. As 
-  benchmarks were performed on an Intel i7-4770K processor, the clearly visible performance degradation 
-  points are around 256 KiB and 8192 KiB, which correspond to L2 and L3 cache sizes. You can see that 
-  operating on small data sizes may be a few times faster than operating on data that does not fit the L3 cache.</p>
+<p class="justify-style">Очевидно ухудшение времени доступа, когда размер данных превышает размер кэша каждого уровня. Поскольку тесты проводились на процессоре Intel i7-4770K, четко видны точки деградации производительности около 256 КБ и 8192 КБ, что соответствует размерам кэша L2 и L3. Вы можете видеть, что работа с небольшими размерами данных может быть в несколько раз быстрее, чем работа с данными, которые не помещаются в кэш L3.</p>
 
+<br>
 <figure id="l-2-5" class="figure">
   <pre class="code border border-secondary">
     <code class="language-csharp">
@@ -620,11 +608,12 @@
         public long data7;
         public long data8;
       }
+
       public static long OneLineStructSequentialReadPattern(OneLineStruct[] tab)
       {
         long sum = 0;
         int n = tab.Length;
-        for (int i = 0; i < n; ++i)
+        for (int i = 0; i &lt; n; ++i)
         {
           unchecked { sum += tab[i].data1; }
         }
@@ -632,37 +621,32 @@
       }
     </code>
   </pre>
-  <figcaption class="figure-caption">Листинг 2-5. Sequential read of succeeding cache lines</figcaption>
+  <figcaption class="figure-caption">Листинг 2-5. Последовательное чтение следующих строк кэша</figcaption>
 </figure>
 
 <figure id="f-2-11" class="figure">
   <img src="content/img/2-11.png" class="img-fluid" alt="Рисунок 2-11" max-width="600">
-  <figcaption class="figure-caption">Рисунок 2-11. Access time depending on the data size – Intel x86 architecture/sequential read. Please note: both 
-    axes are logarithmic</figcaption>
+  <figcaption class="figure-caption">Рисунок 2-11. Время доступа в зависимости от размера данных – архитектура Intel x86/последовательное чтение. Обратите внимание: обе оси логарифмические</figcaption>
 </figure>
 
 <br>
 <div class="card text-bg-info mb-3 bg-opacity-10">
   <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
   <div class="card-body">
-    <p class="card-text justify-style">There is one interesting yet not so important topic in the context of cache – the eviction strategies. 
-      It’s about how you get space for new data if it’s missing at a given level. There are two possible approaches, 
-      sometimes mixed on the different levels:</p>
+    <p class="card-text justify-style">Существует одна интересная, но не столь важная тема в контексте кэша – стратегии вытеснения. Речь идет о том, как освободить место для новых данных, если их нет на данном уровне. Существуют два возможных подхода, иногда смешиваемых на разных уровнях:</p>
     <ul class="bullet-list ms-1">
       <li>
-        <p class="justify-style"><span class="fw-bold fst-italic">Exclusive cache</span>: Data is only on one level of cache. This method is most commonly 
-          used in AMD processors.</p>
+        <p class="justify-style"><span class="fw-bold fst-italic">Эксклюзивный кэш</span>: Данные находятся только на одном уровне кэша. Этот метод чаще всего используется в процессорах AMD.</p>
       </li>
       <li>
-        <p class="justify-style"><span class="fw-bold fst-italic">LInclusive cache</span>: Where each cache line in a lower level (e.g., L1d) is also present in a higher level (e.g., L2).</p>
+        <p class="justify-style"><span class="fw-bold fst-italic">Инклюзивный кэш</span>: Когда каждая строка кэша на нижнем уровне (например, L1d) также присутствует на более высоком уровне (например, L2).</p>
       </li>
     </ul>
-    <p class="card-text justify-style">Although interesting, this does not affect your understanding of memory management. It should be assumed 
-      that CPU manufacturers are doing their best to ensure the most effective implementation of these mechanisms.</p>
+    <p class="card-text justify-style">Хотя это интересно, но это не влияет на ваше понимание управления памятью. Следует предположить, что производители процессоров делают все возможное, чтобы обеспечить наиболее эффективную реализацию этих механизмов.</p>
   </div>
 </div>
 
-<p class="h5 p-2">Multicore Hierarchical Cache</p>
+<p class="h5 p-2">Многоядерный иерархический кэш</p>
 
 <p class="justify-style">Текст...</p>
 
