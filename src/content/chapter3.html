@@ -420,14 +420,192 @@
     <figcaption class="figure-caption">Рисунок 3-10. Монитор производительности – диалоговое окно «Добавить счетчики»</figcaption>
 </figure>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">После добавления счетчиков часто требуется время, чтобы адаптировать диаграммы к своим потребностям. Речь идет в первую очередь о</p>
 
-<p class="justify-style">Текст ...</p>
+<ul class="bullet-list ms-1">
+    <li>
+        <p class="justify-style">Масштабирование каждого графика (щелчок правой кнопкой мыши, Масштаб выбранных счетчиков)</p>
+    </li>
+    <li>
+        <p class="justify-style">Частота и количество выборок (Ctrl+L, вкладка Общие, Выборка каждый и Параметры длительности)</p>
+    </li>
+    <li>
+        <p class="justify-style">Вертикальный масштаб графика (Ctrl+L, вкладка График, Минимальный и Максимальный параметры вертикального масштаба)</p>
+    </li>
+    <li>
+        <p class="justify-style">Способ прокрутки графика (Ctrl+L, вкладка График, параметр Стиль прокрутки)</p>
+    </li>
+</ul>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Правильно выбрав указанные выше параметры (и, возможно, выбрав толщину и цвет каждого ряда данных), вы можете настроить график под краткосрочный анализ или наблюдать за ежедневными тенденциями. Примеры на <a href="#f-3-11">рисунке 3-11</a> и <a href="#f-3-12">рисунке 3-12</a> иллюстрируют это.</p>
+
+<figure id="f-3-11" class="figure">
+    <img src="content/img/3-11.png" class="img-fluid" alt="Рисунок 3-11" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-11. Performance Monitor — анализ короткого периода (100 секунд) с видимыми размерами генерации GC</figcaption>
+</figure>
+
+<figure id="f-3-12" class="figure">
+    <img src="content/img/3-12.png" class="img-fluid" alt="Рисунок 3-12" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-12. Performance Monitor — долгосрочный анализ (50 минут) с видимыми размерами генерации GC</figcaption>
+</figure>
+
+<p class="justify-style">Механизм счетчиков производительности имеет одно раздражающее свойство, с которым вам придется научиться мириться. Как уже упоминалось, каждый процесс, публикующий счетчики под одним и тем же именем, имеет уникальное имя экземпляра, которое соответствует имени процесса. Например, веб-приложение, размещенное на IIS, будет иметь счетчик \.NET CLR Memory(w3wp)\# Bytes in all Heaps (так как приложения пула приложений запускаются в процессе w3wp.exe). Однако если несколько приложений размещены в разных пулах приложений, появится несколько экземпляров, пронумерованных последовательно, например, w3wp, w3wp#1, w3wp#2 и т.д. Как узнать, какой экземпляр соответствует какому пулу приложений? Счетчик .NET CLR Memory/Process ID придет на помощь: он покажет PID каждого процесса экземпляра. Но будьте внимательны! Именно здесь начинается раздражающая часть — соответствие между процессом и экземпляром счетчика производительности может меняться со временем! Если, например, один из пулов приложений останавливается (из-за не активности или по другой причине), оставшиеся процессы изменят свое соответствие экземплярам (см. <a href="#t-3-1">Таблицу 3-1</a>).</p>
+
+<figure id="t-3-1" class="figure">
+    <table class="table table-striped table-hover border-1 ">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">До остановки процесса с PID 11200</th>
+          <th Scope="col">После остановки процесса с PID 11200</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row">1</th>
+          <td>экземпляр w3wp представляет PID11200</td>
+          <td>экземпляр w3wp имеет PID 8710</td>
+        </tr>
+        <tr>
+          <th scope="row">2</th>
+          <td>экземпляр w3wp#1 представляет PID 8710</td>
+          <td>экземпляр w3wp#1 представляет PID 10410</td>
+        </tr>
+        <tr>
+          <th scope="row">3</th>
+          <td>экземпляр w3wp#2 имеет PID 10410</td>
+          <td></td>
+        </tr>        
+      </tbody>
+    </table>
+    <figcaption class="figure-caption">Таблица 3-1. Проблема с динамическим переименованием экземпляров пула приложений</figcaption>
+  </figure>
+
+<p class="justify-style">Это очень раздражает, особенно если вы хотите создать, например, автоматический механизм для наблюдения за определенными пулами приложений. В таком случае важно убедиться, что такие события, как автоматическая остановка пула приложений, вообще не происходят. С аналогичным механизмом вы также можете столкнуться, если в IIS включена опция перезапуска пула приложений с наложением (overlapping). В этом случае некоторое время будут существовать два экземпляра одного и того же счетчика, поэтому переопределение экземпляров неизбежно.</p>
+
+<p class="justify-style">Из-за вышеупомянутого неочевидного соответствия, в случае ручного наблюдения за приложениями, размещенными на IIS, наиболее распространенный сценарий выглядит следующим образом: проверьте текущий PID пула приложений, который вас интересует, и найдите экземпляр w3wp, у которого есть соответствующий счетчик .NET CLR Memory/Process ID. Затем добавьте счетчики именно этого экземпляра.</p>
+
+<p class="justify-style">Альтернативно, вы можете обновить значение ключа реестра <span class="fw-bold fst-italic">ProcessNameFormat</span> в разделе <span class="fw-bold fst-italic">HKLM\System\CurrentControlSet\Services\.NETFramework\Performance</span>. Если установить его в 2, формат имен экземпляров изменится на <code class="fs-6 fst-italic">&lt;processName&gt;_&lt;pid&gt;</code>, что значительно упрощает управление. Однако это изменение будет применяться ко всей системе, поэтому оно может вызвать проблемы с совместимостью некоторых инструментов.</p>
+
+<p class="justify-style">Многие другие программы используют счетчики производительности, но остановимся здесь. Мы будем использовать Performance Monitor для демонстрации работы сборщика мусора в действии на Windows.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-4" class="h4 p-2">Счетчики .NET Core</p>
+
+<p class="justify-style">С момента своего создания .NET Core должен был поддерживать несколько платформ, а не только Windows. Вот почему выдача метрик в виде счетчиков производительности Windows невозможна. Microsoft предоставляет новый набор инструментов интерфейса командной строки (CLI), включая dotnet-counters для прослушивания счетчиков CLR. Другие полезные инструменты CLI будут описаны позже, но все они могут быть установлены двумя разными способами:</p>
+
+<ul class="bullet-list ms-1">
+    <li>
+        <p class="justify-style">Загрузите двоичный файл непосредственно с их веб-страницы по адресу <a href="https://learn.microsoft.com/en-us/dotnet/core/diagnostics/" target="_blank">https://learn.microsoft.com/en-us/dotnet/core/diagnostics/</a>. Выбираете правильную ссылку, соответствующую вашей ОС и платформе. Это позволяет вам создавать скрипты для установки инструмента в ваших контейнерах, например, благодаря curl.</p>
+    </li>
+    <li>
+        <p class="justify-style">На вашей машине разработчика или любой машине с установленным .NET SDK вы можете установить любой инструмент CLI с помощью команды <code class="fs-6 fw-bold fst-italic">dotnet tool install -g &lt;tool name&gt;</code>. Например, <code class="fs-6 fw-bold fst-italic">dotnet tool install -g dotnet-counters</code> устанавливает последнюю версию dotnet-counters. Если вы хотите обновиться до последней версии, используйте <code class="fs-6 fw-bold fst-italic">dotnet tool update -g dotnet-counters</code>.</p>
+    </li>
+</ul>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">После установки dotnet-counters с помощью dotnet install вы можете начать его использовать, но вместо ввода dotnet-counters в командной строке используйте dotnet counters без "-". Эта функция псевдонимов работает для всех инструментов CLI.</p>
+  </div>
+</div>
+
+<p class="justify-style">Вернемся к dotnet-counters. Прежде всего, вам нужно определиться, в каких счетчиках вы заинтересованы. Команда list помогает вам, перечисляя доступные счетчики для каждого поставщика счетчиков. Понятие поставщика счетчиков близко к категории счетчиков производительности Windows.</p>
+
+<p class="justify-style">Базовые счетчики CLR предоставляются поставщиком счетчиков System.Runtime:</p>
+
+<br>
+<figure id="dotnet-counters-list" class="figure">
+    <pre class="code border border-secondary">
+      <code class="language-cpp">
+        C:\> dotnet counters list
+        Showing well-known counters for .NET (Core) version 6.0 only. Specific processes may support 
+        additional counters.
+        System.Runtime
+            cpu-usage                           The percent of process' CPU usage relative to all of 
+                                                the system CPU resources [0-100]
+            working-set                         Amount of working set used by the process (MB)
+            gc-heap-size                        Total heap size reported by the GC (MB)
+            gen-0-gc-count                      Number of Gen 0 GCs between update intervals
+            gen-1-gc-count                      Number of Gen 1 GCs between update intervals
+            gen-2-gc-count                      Number of Gen 2 GCs between update intervals
+            time-in-gc                          % time in GC since the last GC
+            gen-o-size                          Gen O Heap Size
+            gen-l-size                          Gen 1 Heap Size
+            gen-2-size                          Gen 2 Heap Size
+            Ioh-size                            LOH Size
+            poh-size                            POH (Pinned Object Heap) Size
+            alloc-rate                          Number of bytes allocated in the managed heap between
+                                                update intervals
+            gc-fragmentation                    GC Heap Fragmentation
+            assembly-count                      Number of Assemblies Loaded
+            exception-count                     Number of Exceptions / sec
+            threadpool-thread-count             Number of ThreadP001 Threads
+            monitor-lock-contention-count       Number of times there were contention when trying to
+                                                take the monitor lock between update intervals
+            threadpool-queue-length             ThreadP001 Work Items Queue Length
+            threadpool-completed-items-count    ThreadP001 Completed Work Items Count
+            active-timer-count                  Number of timers that are currently active
+            il-bytes-jitted                     Total IL bytes jitted
+            methods-jitted-count                Number of methods jitted
+            gc-committed                        Size of committed memory by the GC (MB)
+      </code>
+    </pre>
+    <figcaption class="figure-caption">Пример консольного вывода команды list. Вывод списка доступных счётчиков.</figcaption>
+  </figure>
+
+<p class="justify-style">Вы можете узнать большинство счетчиков производительности Windows, которые были перечислены ранее, а также несколько новых, которые будут рассмотрены в последующих главах. Кроме того, другие компоненты .NET предоставляют свои собственные счетчики, такие как Microsoft.AspNetCore.Hosting для статистики запросов; Microsoft-AspNetCore-Server-Kestrel для низкоуровневых метрик соединений; System.Net.Http для соединений и метрик запросов; System.Net.NameResolution для подробностей поиска DNS; System.Net.Sockets для низкоуровневой информации о соединениях, байтах и ​​датаграммах; или System.Net.Security для метрик TLS и сеансов.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Эти поставщики жестко запрограммированы в dotnet-counters и могут отличаться в зависимости от версии CLR, в которой работает ваше приложение.</p>
+  </div>
+</div>
+
+<p class="justify-style">Как только вы узнаете, какие счетчики вам интересны, вы можете использовать параметр --counters, чтобы передать их в dotnet-counters. Если вам нужны все счетчики поставщика счетчиков, просто укажите имя поставщика. Если вас интересует только подмножество счетчиков, перечислите их между []:</p>
+
+<p class="justify-style"><code class="fs-5 fw-bold fst-italic">--counters System.Runtime[gc-heap-size,loh-size, gen-2-size]</code></p>
+
+<p class="justify-style">Затем вам нужно узнать идентификатор процесса, который вы хотите отслеживать. Команда <code class="fs-5 fw-bold fst-italic">ps</code> может вам помочь: она выводит список всех приложений, работающих с .NET Core, включая себя (т. е. dotnet) с соответствующим pid, именем процесса, исполняемым путем и командной строкой:</p>
+
+<br>
+<figure id="dotnet-counters-ps" class="figure">
+    <pre class="code border border-secondary">
+      <code class="language-cpp">
+        C:\> dotnet counters ps
+            84716  dotnet  C:\Program Files\dotnet\dotnet.exe    counters ps
+      </code>
+    </pre>
+    <figcaption class="figure-caption">Пример консольного вывода команды ps. Вывод списка всех приложений, работающих с .NET Core.</figcaption>
+  </figure>
+
+<p class="justify-style">Как только у вас есть идентификатор процесса, передайте его через параметр -p.</p>
+
+<p class="justify-style">Доступны два различных режима использования. Как показано на <a href="#f-3-13">рисунке 3-13</a>, при использовании monitor счетчики отображаются в консоли и их значение обновляется каждую секунду (если вы хотите менее частые обновления, используйте параметр --refresh-interval с частотой в секундах).</p>
+
+<figure id="f-3-13" class="figure">
+    <img src="content/img/3-13.png" class="img-fluid" alt="Рисунок 3-13" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-13. dotnet counters monitor — обновление значений различных счетчиков</figcaption>
+</figure>
+
+<p class="justify-style">Этот режим не особо полезен, за исключением разве что демонстраций во время конференций.</p>
+
+<p class="justify-style">На самом деле вам нужен способ записи значений счетчиков с течением времени и анализа эволюции или пиков, как это делается с помощью Performance Monitor. Это то, что предоставляет второй режим сбора: выбранные счетчики (по умолчанию System.Runtime) будут периодически собираться и сохраняться в файле, указанном через параметр -o (или counter по умолчанию). По умолчанию файл сохраняется в формате CSV, но вы можете переключиться на json с помощью --format json.</p>
+
+<p class="justify-style">Наконец, вы можете использовать параметр --duration, чтобы задать продолжительность сбора данных в секундах.</p>
+
+<p class="justify-style">Visual Studio обеспечивает графическую визуализацию счетчиков .NET с течением времени при запуске сеанса профилирования производительности, как показано на <a href="#f-3-14">рисунке 3-14</a>.</p>
+
+<figure id="f-3-14" class="figure">
+    <img src="content/img/3-14.png" class="img-fluid" alt="Рисунок 3-14" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-14. Отображение счетчиков .NET в сеансе профилирования Visual Studio</figcaption>
+</figure>
+
+<p class="justify-style">Если вам нужен визуальный кроссплатформенный инструмент, Конрад Кокоса реализовал его для вас! Более подробную информацию можно найти на сайте <a href="https://github.com/kkokosa/dotnet-counters-ui" target="_blank">https://github.com/kkokosa/dotnet-counters-ui</a>.</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
