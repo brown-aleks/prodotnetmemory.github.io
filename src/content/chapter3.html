@@ -1213,7 +1213,7 @@ dotnet trace collect --providers Microsoft-Windows-DotNETRuntime:40000001:5 --sh
     <figcaption class="figure-caption">Рисунок 3-27. dotnet-gcmon — список сведений о каждом сборщике мусора</figcaption>
 </figure>
 
-<p class="justify-style">В дополнение к инструменту командной строки dotnet-gcmon, в репозитории <a href="https://github.com/Maoni0/realmon">https://github.com/Maoni0/realmon</a> содержится отдельное приложение GCRealTimeMon, работающее только на Windows. Помимо функций, предоставляемых dotnet-gcmon, поколения имеют различные оттенки синего цвета (как в PerfView), а что более важно, оно показывает стек вызовов для инициированных сборок мусора, как это демонстрируется на <a href="#f-3-28">рисунке 3-28</a>, включая событие AllocationTick, соответствующее выделению памяти в LOH (Large Object Heap).</p>
+<p class="justify-style">В дополнение к инструменту командной строки dotnet-gcmon, в репозитории <a href="https://github.com/Maoni0/realmon" target="_blank">https://github.com/Maoni0/realmon</a> содержится отдельное приложение GCRealTimeMon, работающее только на Windows. Помимо функций, предоставляемых dotnet-gcmon, поколения имеют различные оттенки синего цвета (как в PerfView), а что более важно, оно показывает стек вызовов для инициированных сборок мусора, как это демонстрируется на <a href="#f-3-28">рисунке 3-28</a>, включая событие AllocationTick, соответствующее выделению памяти в LOH (Large Object Heap).</p>
 
 <figure id="f-3-28" class="figure">
     <img src="content/img/3-28.png" class="img-fluid" alt="Рисунок 3-28" max-width="600">
@@ -1225,11 +1225,48 @@ dotnet trace collect --providers Microsoft-Windows-DotNETRuntime:40000001:5 --sh
 <hr class="border-2">
 <p id="chapter3-2-9" class="h4 p-2">ProcDump, dotnet-dump</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Часто проблемы с памятью возникают после того, как приложение было развернуто в производстве. Тогда один из вариантов исследования — сделать дамп памяти проблемного приложения и проанализировать его в автономном режиме. Доступны различные инструменты для снятия дампа памяти. Мы хотели бы упомянуть два из них, поскольку они покрывают большинство стандартных потребностей. Эти инструменты устанавливаются как автономные инструменты и могут быть загружены с:</p>
 
-<p class="justify-style">Текст ...</p>
+<ul class="bullet-list ms-1">
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">ProcDump</span>: <a href="https://learn.microsoft.com/en-us/sysinternals/downloads/procdump" target="_blank">https://learn.microsoft.com/en-us/sysinternals/downloads/procdump</a></p>
+    </li>
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">dotnet-dump</span>: <a href="https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-dump" target="_blank">https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-dump</a></p>
+    </li>
+</ul>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">ProcDump — это инструмент командной строки, который позволяет легко сделать дамп памяти приложения, зная идентификатор его процесса:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+procdump -ma &lt;process_id&gt;
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Вы также можете определить многочисленные триггеры, например, когда использование памяти или потребление ЦП превышает заданный порог, а также любое другое заданное значение счетчика производительности. Существует множество других опций, например, периодическое получение дампов памяти и т. д. Посмотрите на подробную справку по командной строке ProcDump для списка всех доступных опций. Обратите внимание, что ProcDump также доступен для Linux.</p>
+
+<p class="justify-style">dotnet-dump — это еще один кроссплатформенный инструмент CLI, предоставляемый Microsoft для захвата (и анализа, как мы увидим позже) дампов памяти. Фактически, он просит приложение .NET Core выполнить самосброс, отправляя команду через EventPipe в CLR, где запущено приложение. В результате создается двоичный файл createdump, установленный со средой выполнения .NET Core, для сброса памяти процесса в файл. Имейте в виду, что если он не работает, вам следует проверить разрешения, примененные к файлу createdump.</p>
+
+<p class="justify-style">Самая короткая команда для захвата дампа:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+dotnet-dump collect -p &lt;process_id&gt;
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Кроме того, вы можете указать имя файла дампа с помощью -o и то, что нужно сохранить в дампе, с помощью --type &lt;Full, Heap или Mini&gt;. В отличие от ProcDump, вы не можете задать условия для запуска генерации дампа.</p>
+
+<p class="justify-style">Как и dotnet-counters, вы можете установить его с помощью .NET SDK, запустив dotnet tool install -g dotnet-dump. Или вы также можете загрузить его напрямую с <a href="https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-dump#install" target="_blank">https://learn.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-dump#install</a>.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-10" class="h4 p-2">dotnet-gcdump CLI инструмент</p>
