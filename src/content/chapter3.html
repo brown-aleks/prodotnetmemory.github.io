@@ -515,42 +515,43 @@
 
 <p class="justify-style">Базовые счетчики CLR предоставляются поставщиком счетчиков System.Runtime:</p>
 
-<br>
 <figure id="dotnet-counters-list" class="figure">
-    <pre class="code border border-secondary">
-      <code class="language-cpp">
-        C:\> dotnet counters list
-        Showing well-known counters for .NET (Core) version 6.0 only. Specific processes may support 
-        additional counters.
-        System.Runtime
-            cpu-usage                           The percent of process' CPU usage relative to all of 
-                                                the system CPU resources [0-100]
-            working-set                         Amount of working set used by the process (MB)
-            gc-heap-size                        Total heap size reported by the GC (MB)
-            gen-0-gc-count                      Number of Gen 0 GCs between update intervals
-            gen-1-gc-count                      Number of Gen 1 GCs between update intervals
-            gen-2-gc-count                      Number of Gen 2 GCs between update intervals
-            time-in-gc                          % time in GC since the last GC
-            gen-o-size                          Gen O Heap Size
-            gen-l-size                          Gen 1 Heap Size
-            gen-2-size                          Gen 2 Heap Size
-            Ioh-size                            LOH Size
-            poh-size                            POH (Pinned Object Heap) Size
-            alloc-rate                          Number of bytes allocated in the managed heap between
-                                                update intervals
-            gc-fragmentation                    GC Heap Fragmentation
-            assembly-count                      Number of Assemblies Loaded
-            exception-count                     Number of Exceptions / sec
-            threadpool-thread-count             Number of ThreadP001 Threads
-            monitor-lock-contention-count       Number of times there were contention when trying to
-                                                take the monitor lock between update intervals
-            threadpool-queue-length             ThreadP001 Work Items Queue Length
-            threadpool-completed-items-count    ThreadP001 Completed Work Items Count
-            active-timer-count                  Number of timers that are currently active
-            il-bytes-jitted                     Total IL bytes jitted
-            methods-jitted-count                Number of methods jitted
-            gc-committed                        Size of committed memory by the GC (MB)
-      </code>
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cpp">
+C:\> dotnet counters list
+Showing well-known counters for .NET (Core) version 6.0 only. Specific processes may support 
+additional counters.
+System.Runtime
+    cpu-usage                           The percent of process' CPU usage relative to all of 
+                                        the system CPU resources [0-100]
+    working-set                         Amount of working set used by the process (MB)
+    gc-heap-size                        Total heap size reported by the GC (MB)
+    gen-0-gc-count                      Number of Gen 0 GCs between update intervals
+    gen-1-gc-count                      Number of Gen 1 GCs between update intervals
+    gen-2-gc-count                      Number of Gen 2 GCs between update intervals
+    time-in-gc                          % time in GC since the last GC
+    gen-o-size                          Gen O Heap Size
+    gen-l-size                          Gen 1 Heap Size
+    gen-2-size                          Gen 2 Heap Size
+    Ioh-size                            LOH Size
+    poh-size                            POH (Pinned Object Heap) Size
+    alloc-rate                          Number of bytes allocated in the managed heap between
+                                        update intervals
+    gc-fragmentation                    GC Heap Fragmentation
+    assembly-count                      Number of Assemblies Loaded
+    exception-count                     Number of Exceptions / sec
+    threadpool-thread-count             Number of ThreadP001 Threads
+    monitor-lock-contention-count       Number of times there were contention when trying to
+                                        take the monitor lock between update intervals
+    threadpool-queue-length             ThreadP001 Work Items Queue Length
+    threadpool-completed-items-count    ThreadP001 Completed Work Items Count
+    active-timer-count                  Number of timers that are currently active
+    il-bytes-jitted                     Total IL bytes jitted
+    methods-jitted-count                Number of methods jitted
+    gc-committed                        Size of committed memory by the GC (MB)
+            </code>
+        </div>
     </pre>
     <figcaption class="figure-caption">Пример консольного вывода команды list. Вывод списка доступных счётчиков.</figcaption>
   </figure>
@@ -571,13 +572,14 @@
 
 <p class="justify-style">Затем вам нужно узнать идентификатор процесса, который вы хотите отслеживать. Команда <code class="fs-5 fw-bold fst-italic">ps</code> может вам помочь: она выводит список всех приложений, работающих с .NET Core, включая себя (т. е. dotnet) с соответствующим pid, именем процесса, исполняемым путем и командной строкой:</p>
 
-<br>
 <figure id="dotnet-counters-ps" class="figure">
-    <pre class="code border border-secondary">
-      <code class="language-cpp">
-        C:\> dotnet counters ps
-            84716  dotnet  C:\Program Files\dotnet\dotnet.exe    counters ps
-      </code>
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cpp">
+C:\> dotnet counters ps
+    84716  dotnet  C:\Program Files\dotnet\dotnet.exe    counters ps
+            </code>
+        </div>
     </pre>
     <figcaption class="figure-caption">Пример консольного вывода команды ps. Вывод списка всех приложений, работающих с .NET Core.</figcaption>
   </figure>
@@ -670,12 +672,14 @@
 <p class="justify-style">Вы можете использовать встроенную утилиту logman.exe для поиска всех поставщиков, связанных с .NET, в системе (см. <a href="#l-3-1">листинг 3-1)</a>.</p>
 
 <figure id="l-3-1" class="figure">
-    <pre class="code border border-secondary">
-      <code class="language-cpp">
-        <b>C:\> logman query providers | findstr DotNET</b>
-        Microsoft-Windows-DotNETRuntime          {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
-        Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}
-      </code>
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cpp">
+<b>C:\> logman query providers | findstr DotNET</b>
+Microsoft-Windows-DotNETRuntime          {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
+Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}
+            </code>
+        </div>
     </pre>
     <figcaption class="figure-caption">Листинг 3-1. Использование утилиты logman для составления списка всех поставщиков ETW, связанных с .NET</figcaption>
 </figure>
@@ -683,24 +687,26 @@
 <p class="justify-style">Вы также можете использовать logman, чтобы узнать, какие поставщики доступны в контексте определенного процесса. Например, если вы спросите об ASP.NET WebAPI, размещенном на IIS, вы получите список, как в <a href="#l-3-2">Листинге 3-2</a> (результат представляет только некоторых из многих перечисленных поставщиков).</p>
 
 <figure id="l-3-2" class="figure">
-    <pre class="code border border-secondary">
-      <code class="language-cpp">
-        <b>C:\> logman query providers -pid 6228</b>
-        Provider                                 GUID
-       --------------------------------------------------------------------------
-       <b>.NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}</b>
-       ASP.NET Events                           {AFF081FE-0247-4275-9C4E-021F3DC1DA35}
-       IIS: WWW Global                          {D55D3BC9-CBA9-44DF-827E-132D3A4596C2}
-       IIS: WWW Isapi Extension                 {A1C2040E-8840-4C31-BA11-9871031A19EA}
-       IIS: WWW Server                          {3A2A4E84-4C21-4981-AE10-3FDA0D9B0F83}
-       Microsoft-Windows-Application            {C651F5F6-1C0D-492E-8AE1-B4EFD7C9D503}
-       Server-Applications                      
-       Microsoft-Windows-Application-Experience {EEF54E71-0661-422D-9A98-82FD4940B820}
-       <b>Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}</b>
-       Microsoft-Windows-IIS                    {DE4649C9-15E8-4FEA-9D85-1CDDA520C334}
-       Microsoft-Windows-IIS-Configuration      {DC0B8E51-4863-407A-BC3C-1B479B2978AC}
-       ...
-      </code>
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cpp">
+<b>C:\> logman query providers -pid 6228</b>
+Provider                                 GUID
+--------------------------------------------------------------------------
+<b>.NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}</b>
+ASP.NET Events                           {AFF081FE-0247-4275-9C4E-021F3DC1DA35}
+IIS: WWW Global                          {D55D3BC9-CBA9-44DF-827E-132D3A4596C2}
+IIS: WWW Isapi Extension                 {A1C2040E-8840-4C31-BA11-9871031A19EA}
+IIS: WWW Server                          {3A2A4E84-4C21-4981-AE10-3FDA0D9B0F83}
+Microsoft-Windows-Application            {C651F5F6-1C0D-492E-8AE1-B4EFD7C9D503}
+Server-Applications                      
+Microsoft-Windows-Application-Experience {EEF54E71-0661-422D-9A98-82FD4940B820}
+<b>Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}</b>
+Microsoft-Windows-IIS                    {DE4649C9-15E8-4FEA-9D85-1CDDA520C334}
+Microsoft-Windows-IIS-Configuration      {DC0B8E51-4863-407A-BC3C-1B479B2978AC}
+...
+            </code>
+        </div>
     </pre>
     <figcaption class="figure-caption">Листинг 3-2. Использование утилиты logman для составления списка всех поставщиков ETW данного процесса ASP.NET</figcaption>
 </figure>
@@ -708,25 +714,27 @@
 <p class="justify-style">Если вы спросите о консольном приложении, работающем на .NET Core, то вы получите немного другой набор поставщиков (см. <a href="#l-3-3">Листинг 3-3</a>).</p>
 
 <figure id="l-3-3" class="figure">
-    <pre class="code border border-secondary">
-      <code class="language-cpp">
-        <b>C:\> logman query providers -pid 8528</b>
-        Provider                                 GUID
-        --------------------------------------------------------------------------
-        <b>.NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}</b>
-        Microsoft-Windows-AsynchronousCausality  {19A4C69A-28EB-4D4B-8D94-5F19055A1B5C}
-        Microsoft-Windows-COM-Perf               {B8D6861B-D20F-4EEC-BBAE-87E0DD80602B}
-        Microsoft-Windows-Crypto-BCrypt          {C7E089AC-BA2A-11E0-9AF7-68384824019B}
-        Microsoft-Windows-Crypto-RSAEnh          {152FDB2B-6E9D-4B60-B317-815D5F174C4A}
-        <b>Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}</b>
-        Microsoft-Windows-Networking-Correlation {83ED54F0-4D48-4E45-B16E-726FFD1FA4AF}
-        Microsoft-Windows-Shell-Core             {30336ED4-E327-447C-9DE0-51B652C86108}
-        Microsoft-Windows-User-Diagnostic        {305FC87B-002A-5E26-D297-60223012CA9C}
-        Microsoft-Windows-WinRT-Error            {A86F8471-C31D-4FBC-A035-665D06047B03}
-        {012616AB-FF6D-4503-A6F0-EFFD0523ACE6}   {012616AB-FF6D-4503-A6F0-EFFD0523ACE6}
-        {05F95EFE-7F75-49C7-A994-60A55CC09571}   {05F95EFE-7F75-49C7-A994-60A55CC09571}
-        ...
-      </code>
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+<b>C:\> logman query providers -pid 8528</b>
+Provider                                 GUID
+--------------------------------------------------------------------------
+<b>.NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}</b>
+Microsoft-Windows-AsynchronousCausality  {19A4C69A-28EB-4D4B-8D94-5F19055A1B5C}
+Microsoft-Windows-COM-Perf               {B8D6861B-D20F-4EEC-BBAE-87E0DD80602B}
+Microsoft-Windows-Crypto-BCrypt          {C7E089AC-BA2A-11E0-9AF7-68384824019B}
+Microsoft-Windows-Crypto-RSAEnh          {152FDB2B-6E9D-4B60-B317-815D5F174C4A}
+<b>Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}</b>
+Microsoft-Windows-Networking-Correlation {83ED54F0-4D48-4E45-B16E-726FFD1FA4AF}
+Microsoft-Windows-Shell-Core             {30336ED4-E327-447C-9DE0-51B652C86108}
+Microsoft-Windows-User-Diagnostic        {305FC87B-002A-5E26-D297-60223012CA9C}
+Microsoft-Windows-WinRT-Error            {A86F8471-C31D-4FBC-A035-665D06047B03}
+{012616AB-FF6D-4503-A6F0-EFFD0523ACE6}   {012616AB-FF6D-4503-A6F0-EFFD0523ACE6}
+{05F95EFE-7F75-49C7-A994-60A55CC09571}   {05F95EFE-7F75-49C7-A994-60A55CC09571}
+...
+            </code>
+        </div>
     </pre>
     <figcaption class="figure-caption">Листинг 3-3. Использование утилиты logman для составления списка всех поставщиков ETW данного процесса .NET Core</figcaption>
 </figure>
@@ -759,52 +767,54 @@
 <p class="justify-style">С помощью инструмента logman вы также можете узнать подробности о конкретном провайдере. Для основного провайдера .NET ETW вы получите информацию, как в <a href="#l-3-4">листинге 3-4</a>.</p>
 
 <figure id="l-3-4" class="figure">
-    <pre class="code border border-secondary">
-        <code class="language-cpp">
-            C:\> logman query providers "Microsoft-Windows-DotNETRuntime"
-            Provider                                GUID
-            --------------------------------------------------------------------------
-            Microsoft-Windows-DotNETRuntime         {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
-            Value               Keyword             Description
-            --------------------------------------------------------------------------
-            0x0000000000000001  GCKeyword           GC
-            0x0000000000000002  GCHandleKeyword     GCHandle
-            0x0000000000000004  FusionKeyword       Binder
-            0x0000000000000008  LoaderKeyword       Loader
-            0x0000000000000010  JitKeyword          Jit
-            0x0000000000000020  NGenKeyword         NGen
-            0x0000000000000040  StartEnumerationKeyword StartEnumeration
-            0x0000000000000080  EndEnumerationKeyword StopEnumeration
-            0x0000000000000400  SecurityKeyword     Security
-            0x0000000000000800  AppDomainResourceManagementKeyword AppDomainResourceManagement
-            0x0000000000001000  JitTracingKeyword   JitTracing
-            0x0000000000002000  InteropKeyword      Interop
-            0x0000000000004000  ContentionKeyword   Contention
-            0x0000000000008000  ExceptionKeyword    Exception
-            0x0000000000010000  ThreadingKeyword    Threading
-            0x0000000000020000  JittedMethodILToNativeMapKeyword JittedMethodILToNativeMap
-            0x0000000000040000  OverrideAndSuppressNGenEventsKeyword OverrideAndSuppressNGenEvents
-            0x0000000000080000  TypeKeyword         Type
-            0x0000000000100000  GCHeapDumpKeyword   GCHeapDump
-            0x0000000000200000  GCSampledObjectAllocationHighKeyword GCSampledObjectAllocationHigh
-            0x0000000000400000  GCHeapSurvivalAndMovementKeyword GCHeapSurvivalAndMovement
-            0x0000000000800000  GCHeapCollectKeyword GCHeapCollect
-            0x0000000001000000  GCHeapAndTypeNamesKeyword GCHeapAndTypeNames
-            0x0000000002000000  GCSampledObjectAllocationLowKeyword GCSampledObjectAllocationLow
-            0x0000000020000000  PerfTrackKeyword    PerfTrack
-            0x0000000040000000  StackKeyword        Stack
-            0x0000000080000000  ThreadTransferKeyword ThreadTransfer
-            0x0000000100000000  DebuggerKeyword     Debugger
-            0x0000000200000000  MonitoringKeyword   Value
-            Level               Monitoring         Description
-            --------------------------------------------------------------------------
-            0x00                win:LogAlways      Log Always
-            0x02                win:Error          Error
-            0x04                win:Informational  Information
-            0x05                win:Verbose        Verbose
-            ...
-            followed by the list of processes containing this provider.
-        </code>
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+C:\> logman query providers "Microsoft-Windows-DotNETRuntime"
+Provider                                GUID
+--------------------------------------------------------------------------
+Microsoft-Windows-DotNETRuntime         {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
+Value               Keyword             Description
+--------------------------------------------------------------------------
+0x0000000000000001  GCKeyword           GC
+0x0000000000000002  GCHandleKeyword     GCHandle
+0x0000000000000004  FusionKeyword       Binder
+0x0000000000000008  LoaderKeyword       Loader
+0x0000000000000010  JitKeyword          Jit
+0x0000000000000020  NGenKeyword         NGen
+0x0000000000000040  StartEnumerationKeyword StartEnumeration
+0x0000000000000080  EndEnumerationKeyword StopEnumeration
+0x0000000000000400  SecurityKeyword     Security
+0x0000000000000800  AppDomainResourceManagementKeyword AppDomainResourceManagement
+0x0000000000001000  JitTracingKeyword   JitTracing
+0x0000000000002000  InteropKeyword      Interop
+0x0000000000004000  ContentionKeyword   Contention
+0x0000000000008000  ExceptionKeyword    Exception
+0x0000000000010000  ThreadingKeyword    Threading
+0x0000000000020000  JittedMethodILToNativeMapKeyword JittedMethodILToNativeMap
+0x0000000000040000  OverrideAndSuppressNGenEventsKeyword OverrideAndSuppressNGenEvents
+0x0000000000080000  TypeKeyword         Type
+0x0000000000100000  GCHeapDumpKeyword   GCHeapDump
+0x0000000000200000  GCSampledObjectAllocationHighKeyword GCSampledObjectAllocationHigh
+0x0000000000400000  GCHeapSurvivalAndMovementKeyword GCHeapSurvivalAndMovement
+0x0000000000800000  GCHeapCollectKeyword GCHeapCollect
+0x0000000001000000  GCHeapAndTypeNamesKeyword GCHeapAndTypeNames
+0x0000000002000000  GCSampledObjectAllocationLowKeyword GCSampledObjectAllocationLow
+0x0000000020000000  PerfTrackKeyword    PerfTrack
+0x0000000040000000  StackKeyword        Stack
+0x0000000080000000  ThreadTransferKeyword ThreadTransfer
+0x0000000100000000  DebuggerKeyword     Debugger
+0x0000000200000000  MonitoringKeyword   Value
+Level               Monitoring         Description
+--------------------------------------------------------------------------
+0x00                win:LogAlways      Log Always
+0x02                win:Error          Error
+0x04                win:Informational  Information
+0x05                win:Verbose        Verbose
+...
+followed by the list of processes containing this provider.
+            </code>
+        </div>
     </pre>
     <figcaption class="figure-caption">Листинг 3-4. Получение сведений о поставщике .NET ETW</figcaption>
 </figure>
@@ -1118,10 +1128,79 @@
 
 <hr class="border-2">
 <p id="chapter3-2-7" class="h4 p-2">Инструмент dotnet-trace CLI</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Кроссплатформенным эквивалентом PerfView для сбора событий является инструмент CLI dotnet-trace. Команда collect записывает события из приложения, идентифицированного по идентификатору процесса с помощью -p. События сохраняются в файле с именем процесса в качестве префикса, за которым следуют дата и время, разделенные _. Используйте параметр -o, чтобы задать другое имя файла. Формат файла .nettrace понимается PerfView, где вы сможете анализировать события, как описано в предыдущем разделе. Однако также возможно сохранять события в формате Chromium или Speedcope с помощью параметра --format &lt;Chromium | Speedscope&gt;. Используйте параметр --duration, чтобы попросить dotnet-trace остановить запись после заданной продолжительности (в формате дд:чч:мм:сс).</p>
+
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-body">
+    <p class="card-text justify-style">Инструкции по установке см. в предыдущем разделе CLI.</p>
+  </div>
+</div>
+
+<p class="justify-style">Как и в случае с PerfView, вам нужно выбрать события, которые вы хотите записать. Здесь существуют те же понятия поставщика событий, ключевого слова и детализации. По умолчанию, в дополнение к некоторым событиям от поставщика Microsoft-Windows-DotNETRuntime, также включен пользовательский поставщик записи обхода стека с именем Microsoft-DotNETCore-SampleProfiler. Это позволяет вам анализировать выполнение потоков вашего приложения, однако влияние на производительность заметно. Кроме того, с этим профилем по умолчанию некоторые события GC, такие как AllocationTick, не записываются. Чтобы облегчить вам жизнь, был определен набор профилей, которые можно перечислить с помощью команды dotnet trace list-profiles:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+cpu-sampling  - Полезно для отслеживания использования ЦП и общей информации о времени выполнения .NET.
+                Это вариант по умолчанию, если профиль или поставщики не указаны.
+gc-verbose    - Отслеживает коллекции сборки мусора и выборку выделения объектов.
+gc-collect    - Отслеживает коллекции GC только с очень низкими накладными расходами.
+database      - Захватывает команды базы данных ADO.NET и Entity Framework Core.
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Вы также можете выбрать ключевые слова и уровень детализации для определенных поставщиков с помощью параметра --providers со следующим синтаксисом:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+--providers Microsoft-Windows-DotNETRuntime:40000001:5
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Первое числовое значение — это ключевые слова в шестнадцатеричном формате, за которыми следует уровень детализации. Если вам нужно сосредоточиться только на поставщике Microsoft-Windows-DotNETRuntime и вы не знаете числовые значения ключевых слов наизусть, смело используйте --clrleventlevel &lt;от 0 до 5 для уровня детализации&gt; с --clrevent, за которым следует имя ключевого слова, разделенное знаком +:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+--clrevents gc+stack --clreventlevel 5
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Начиная с .NET 5.0, вы можете использовать -- для запуска приложения и записи его событий. Это полезно, если вам нужно диагностировать проблемы при запуске:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+dotnet trace collect --providers Microsoft-Windows-DotNETRuntime:40000001:5 --show-child-io
+-- C:\Apps\Simulator.exe
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Параметр --show-child-io позволяет вам взаимодействовать с процессом, если он запущен как консольное приложение, и гарантирует, что вы получите все события с начала приложения. Обратите внимание, что если вы используете --duration, порожденный процесс будет завершен, когда dotnet-trace закончит запись.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-8" class="h4 p-2">Инструмент dotnet-gcmon CLI</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
