@@ -707,13 +707,212 @@
 
 <p class="justify-style">Если вы спросите о консольном приложении, работающем на .NET Core, то вы получите немного другой набор поставщиков (см. <a href="#l-3-3">Листинг 3-3</a>).</p>
 
-<p class="justify-style">Текст ...</p>
+<figure id="l-3-3" class="figure">
+    <pre class="code border border-secondary">
+      <code class="language-cpp">
+        <b>C:\> logman query providers -pid 8528</b>
+        Provider                                 GUID
+        --------------------------------------------------------------------------
+        <b>.NET Common Language Runtime             {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}</b>
+        Microsoft-Windows-AsynchronousCausality  {19A4C69A-28EB-4D4B-8D94-5F19055A1B5C}
+        Microsoft-Windows-COM-Perf               {B8D6861B-D20F-4EEC-BBAE-87E0DD80602B}
+        Microsoft-Windows-Crypto-BCrypt          {C7E089AC-BA2A-11E0-9AF7-68384824019B}
+        Microsoft-Windows-Crypto-RSAEnh          {152FDB2B-6E9D-4B60-B317-815D5F174C4A}
+        <b>Microsoft-Windows-DotNETRuntimeRundown   {A669021C-C450-4609-A035-5AF59AF4DF18}</b>
+        Microsoft-Windows-Networking-Correlation {83ED54F0-4D48-4E45-B16E-726FFD1FA4AF}
+        Microsoft-Windows-Shell-Core             {30336ED4-E327-447C-9DE0-51B652C86108}
+        Microsoft-Windows-User-Diagnostic        {305FC87B-002A-5E26-D297-60223012CA9C}
+        Microsoft-Windows-WinRT-Error            {A86F8471-C31D-4FBC-A035-665D06047B03}
+        {012616AB-FF6D-4503-A6F0-EFFD0523ACE6}   {012616AB-FF6D-4503-A6F0-EFFD0523ACE6}
+        {05F95EFE-7F75-49C7-A994-60A55CC09571}   {05F95EFE-7F75-49C7-A994-60A55CC09571}
+        ...
+      </code>
+    </pre>
+    <figcaption class="figure-caption">Листинг 3-3. Использование утилиты logman для составления списка всех поставщиков ETW данного процесса .NET Core</figcaption>
+</figure>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Как вы можете видеть, поставщики, связанные с .NET, имеют одинаковый GUID в .NET Framework и приложении .NET Core. Если вам не повезло и вы все еще используете .NET Core 2.1 или более раннюю версию, вы также заметите, что есть два имени для одного и того же поставщика, которые используются взаимозаменяемо: Microsoft-Windows-DotNETRuntime также называется .NET Common Language Runtime.</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Каждое событие ETW, создаваемое в рамках данного поставщика, имеет несколько важных атрибутов:</p>
 
-<p class="justify-style">Текст ...</p>
+<ul class="bullet-list ms-1">
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Id</span>: Уникальный идентификатор события.</p>
+    </li>
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Version</span>: Используется для управления версиями событий.</p>
+    </li>
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Keyword</span>: Битовая маска, используемая для присвоения одного или нескольких значений (ключевых слов) событию.</p>
+    </li>
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Level</span>: Уровень ведения журнала.</p>
+    </li>
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Opcode</span>: Под ним подразумевается конкретное действие (этап) в рамках данного события. Наиболее часто используемыми встроенными значениями являются коды операций Start и End.</p>
+    </li>
+    <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">Task</span>: Он используется для группировки событий от поставщика по определенным функциям.</p>
+    </li>
+</ul>
+
+<p class="justify-style">С помощью инструмента logman вы также можете узнать подробности о конкретном провайдере. Для основного провайдера .NET ETW вы получите информацию, как в <a href="#l-3-4">листинге 3-4</a>.</p>
+
+<figure id="l-3-4" class="figure">
+    <pre class="code border border-secondary">
+        <code class="language-cpp">
+            C:\> logman query providers "Microsoft-Windows-DotNETRuntime"
+            Provider                                GUID
+            --------------------------------------------------------------------------
+            Microsoft-Windows-DotNETRuntime         {E13C0D23-CCBC-4E12-931B-D9CC2EEE27E4}
+            Value               Keyword             Description
+            --------------------------------------------------------------------------
+            0x0000000000000001  GCKeyword           GC
+            0x0000000000000002  GCHandleKeyword     GCHandle
+            0x0000000000000004  FusionKeyword       Binder
+            0x0000000000000008  LoaderKeyword       Loader
+            0x0000000000000010  JitKeyword          Jit
+            0x0000000000000020  NGenKeyword         NGen
+            0x0000000000000040  StartEnumerationKeyword StartEnumeration
+            0x0000000000000080  EndEnumerationKeyword StopEnumeration
+            0x0000000000000400  SecurityKeyword     Security
+            0x0000000000000800  AppDomainResourceManagementKeyword AppDomainResourceManagement
+            0x0000000000001000  JitTracingKeyword   JitTracing
+            0x0000000000002000  InteropKeyword      Interop
+            0x0000000000004000  ContentionKeyword   Contention
+            0x0000000000008000  ExceptionKeyword    Exception
+            0x0000000000010000  ThreadingKeyword    Threading
+            0x0000000000020000  JittedMethodILToNativeMapKeyword JittedMethodILToNativeMap
+            0x0000000000040000  OverrideAndSuppressNGenEventsKeyword OverrideAndSuppressNGenEvents
+            0x0000000000080000  TypeKeyword         Type
+            0x0000000000100000  GCHeapDumpKeyword   GCHeapDump
+            0x0000000000200000  GCSampledObjectAllocationHighKeyword GCSampledObjectAllocationHigh
+            0x0000000000400000  GCHeapSurvivalAndMovementKeyword GCHeapSurvivalAndMovement
+            0x0000000000800000  GCHeapCollectKeyword GCHeapCollect
+            0x0000000001000000  GCHeapAndTypeNamesKeyword GCHeapAndTypeNames
+            0x0000000002000000  GCSampledObjectAllocationLowKeyword GCSampledObjectAllocationLow
+            0x0000000020000000  PerfTrackKeyword    PerfTrack
+            0x0000000040000000  StackKeyword        Stack
+            0x0000000080000000  ThreadTransferKeyword ThreadTransfer
+            0x0000000100000000  DebuggerKeyword     Debugger
+            0x0000000200000000  MonitoringKeyword   Value
+            Level               Monitoring         Description
+            --------------------------------------------------------------------------
+            0x00                win:LogAlways      Log Always
+            0x02                win:Error          Error
+            0x04                win:Informational  Information
+            0x05                win:Verbose        Verbose
+            ...
+            followed by the list of processes containing this provider.
+        </code>
+    </pre>
+    <figcaption class="figure-caption">Листинг 3-4. Получение сведений о поставщике .NET ETW</figcaption>
+</figure>
+
+<p class="justify-style">Например, для списка событий, сгенерированных поставщиками .NET, вы можете использовать документацию Microsoft по адресу <a href="https://learn.microsoft.com/en-us/dotnet/framework/performance/clr-etw-events" target="_blank">https://learn.microsoft.com/en-us/dotnet/framework/performance/clr-etw-events</a>. Однако не все события документированы. Поэтому лучше посмотреть на источник, а точнее на файл манифеста данного поставщика. Файл манифеста ETW определяет строго типизированную информацию о событиях, сгенерированную для данного поставщика. Это позволяет потребителю правильно интерпретировать записанные данные сеанса. Файлы манифеста различны для каждой версии среды выполнения .NET. Вы можете найти их в разных местах:</p>
+
+<ul class="bullet-list ms-1">
+    <li>
+        <p class="justify-style">Для .NET Core, в .\runtime\src\coreclr\vm\ClrEtwAll.man в github</p>
+    </li>
+    <li>
+        <p class="justify-style">Для .NET Framework 4.0 и более поздних версий, в c:\Windows\Microsoft.NET\Framework64\v4.0.30319\CLR-ETW.man</p>
+    </li>
+    <li>
+        <p class="justify-style">Для .NET Framework 2.0 и более ранних версий он недоступен, так как они не поддерживают ETW.</p>
+    </li>
+</ul>
+
+<p class="justify-style">Когда вы посмотрите на этот файл, вы найдете полное описание поставщиков Microsoft-WindowsDotNETRuntime и Microsoft-Windows-DotNETRuntimeRundown. Этот файл — настоящий кладезь знаний, если вы хотите использовать поставщиков .NET ETW. Давайте кратко рассмотрим события, которые выдают оба поставщика. Мы вернемся ко всем этим событиям в следующих главах этой книги, чтобы вы имели полное представление о каждом из них. Однако сначала мы сосредоточимся здесь на самых интересных. Это позволит вам увидеть, насколько богата информация, предоставляемая поставщиками .NET ETW. Не беспокойтесь о Linux, те же события (и даже больше) выдаются .NET Core через кроссплатформенный канал связи EventPipe.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Рассмотрение только испускаемых событий может привести к некоторым интересным вопросам. Например, что такое сегмент <span class="fw-bold fst-italic">ReadOnlyHeapMapMessage</span> типа <span class="fw-bold fst-italic">GCSegmentTypeMap?</span> Мы ответим на этот вопрос в Главе 5.</p>
+  </div>
+</div>
+
+<p class="justify-style">Нас в основном интересуют события, генерируемые поставщиком Microsoft-Windows-DotNETRuntime, сгруппированные в 29 различных задач (как в номенклатуре ETW, атрибут события задачи соответствует ее функциональной категории). Чтобы получить представление о полноте предоставленной информации, эти задачи включают в себя (в скобках показано количество событий данной задачи): AppDomainResourceManagement (5), CLRAuthenticodeVerification CLRILStub (2), CLRLoader (18), CLRMethod (25), CLRPerfTrack (1), CLRRuntimeInformation (1), CLRStack (1), CLRStrongNameVerification (4), Contention (3), Exception (3), ExceptionCatch (2), ExceptionFilter (2), ExceptionFinally (2), GarbageCollection (58), IOThreadCreation (4), IOThreadRetirement (4), Thread (2), ThreadPool (5), ThreadPoolWorkerThread (3) и Type (1).</p>
+
+<p class="justify-style">Как вы можете видеть, самая большая группа — это задача Garbage Collector — она содержит 58 различных событий! На самом деле, их всего 44, поскольку определены разные версии одного и того же события. Вы найдете несколько выбранных событий вместе с описанием и их полезной нагрузкой в <a href="#t-3-2">таблице 3-2</a>.</p>
+
+<figure id="t-3-2" class="figure">
+    <table class="table table-striped table-hover border-1 ">
+        <thead>
+            <tr>
+            <th scope="col">#</th>
+            <th scope="col">Событие</th>
+            <th Scope="col">Данные</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row">1</th>
+                <td>GCStart_V2</td>
+                <td>
+                    <p class="left-style">ClientSequenceNumber(win:UInt64), ClrInstanceID(win:UInt16),Count(win:UInt32), Depth(win:UInt32), Reason(GCReasonMap), Type(GCTypeMap)</p>
+                    <p class="left-style">Сообщает о начале сборки мусора, указывая причину и поколение, вызвавшее ее (в поле Depth)</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">2</th>
+                <td>GCEnd_V1</td>
+                <td>
+                    <p class="left-style">ClrInstanceID(win:UInt16), Count(win:UInt32), Depth(win:UInt32)</p>
+                    <p class="left-style">Информирует об окончании сборки мусора</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">3</th>
+                <td>GCCreateSegment_V1</td>
+                <td>
+                    <p class="left-style">Address(win:UInt64), ClrInstanceID(win:UInt16), Size(win:UInt64), Type(GCSegmentTypeMap)</p>
+                    <p class="left-style">Информирует о создании новых сегментов памяти, предоставляя информацию об их размере и типе</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">4</th>
+                <td>GCSuspendEEBegin_V1</td>
+                <td>
+                    <p class="left-style">ClrInstanceID(win:UInt16), Count(win:UInt32), Reason(GCSuspendEEReasonMap)</p>
+                    <p class="left-style">Информирует о том, когда среда выполнения начинает приостанавливать все потоки приложения в соответствии с требованиями некоторых частей сборки мусора</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">5</th>
+                <td>GCSuspendEEEnd_V1</td>
+                <td>
+                    <p class="left-style">ClrInstanceID(win:UInt16)</p>
+                    <p class="left-style">Информирует, когда среда выполнения приостановила все потоки приложения</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">6</th>
+                <td>GCAllocationTick_V4</td>
+                <td>
+                    <p class="left-style">Address(win:Pointer), ObjectSize(win:UInt64), AllocationAmount(win:UInt32), AllocationAmount64(win:UInt64), AllocationKind(GCAllocationKindMap), ClrInstanceID(win:UInt16), HeapIndex(win:UInt32), TypeID(win:Pointer), TypeName(win:UnicodeString)</p>
+                    <p class="left-style">Периодическое событие выборки (генерируемое после выделения 100 КБ) для информирования о последнем выделенном типе</p>
+                </td>
+            </tr>
+            <tr>
+                <th scope="row">7</th>
+                <td>GCHeapStats_V2</td>
+                <td>
+                    <p class="left-style">ClrInstanceID(win:UInt16), FinalizationPromotedCount(win:UInt64), FinalizationPromotedSize(win:UInt64), GCHandleCount(win:UInt32), GenerationSize0(win:UInt64), GenerationSize1(win:UInt64), GenerationSize2(win:UInt64), GenerationSize3(win:UInt64), GenerationSize4(win:UInt64), PinnedObjectCount(win:UInt32), SinkBlockCount(win:UInt32), TotalPromotedSize0(win:UInt64), TotalPromotedSize1(win:UInt64), TotalPromotedSize2(win:UInt64), TotalPromotedSize3(win:UInt64), TotalPromotedSize4(win:UInt64)</p>
+                    <p class="left-style">Предоставляет обширную информацию о статистике кучи в целом, включая размеры поколений в конце сборки мусора</p>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <figcaption class="figure-caption">Таблица 3-2. Пример событий ETW, связанных с GC</figcaption>
+  </figure>
+
+<p class="justify-style">Если учесть, что каждое событие имеет точную временную метку и может содержать стек вызовов, вы должны начать понимать, какую мощную диагностику можно создать из этих событий. И именно поэтому она используется многими различными инструментами. Некоторые из них будут раскрыты в следующих подразделах.</p>
+
+<p class="justify-style">Не бойтесь, если вы не понимаете описания всех событий ETW, приведенных в <a href="#t-3-2">Таблице 3-2</a>. Очевидно, что необходимы некоторые знания о GC. Мы вернемся ко многим событиям ETW (включая те, что из <a href="#t-3-2">Таблицы 3-2</a>) в следующих главах.</p>
+
+<p class="justify-style">Сеанс NT Kernel Logger также предоставляет много ценной информации, включая такие события, как Windows Kernel\ProcessStart, Windows Kernel\ProcessEnd при запуске и завершении процесса, Windows Kernel\ImageLoad при загрузке динамической библиотеки, Windows Kernel\TcpIpRecv при получении пакетов TCP/IP, Windows Kernel\CSwitch при переключении ЦП с выполнения одного потока на другой, также известном как переключение контекста. Очевидно, что есть и много других, но перечисление здесь лишь небольшой их части не имеет смысла.</p>
 
 <p class="justify-style">Текст ...</p>
 
