@@ -1195,16 +1195,40 @@ dotnet trace collect --providers Microsoft-Windows-DotNETRuntime:40000001:5 --sh
 <hr class="border-2">
 <p id="chapter3-2-8" class="h4 p-2">Инструмент dotnet-gcmon CLI</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Если вам нужно подробно отслеживать запущенные сборки мусора, вы можете использовать инструмент dotnet-gcmon, написанный Маони Стивенсом (ведущим разработчиком .NET GC). Это эквивалент представления GCStats в PerfView, но настраиваемый, со статистикой кучи и в реальном времени!</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">После установки с помощью команды dotnet tool install dotnet-gcmon -g вам следует запустить ее с параметром -c, чтобы выбрать интересующие вас столбцы, как показано на <a href="#f-3-26">рисунке 3-26</a>.</p>
 
-<p class="justify-style">Текст ...</p>
+<figure id="f-3-26" class="figure">
+    <img src="content/img/3-26.png" class="img-fluid" alt="Рисунок 3-26" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-26. dotnet-gcmon – выбор столбцов</figcaption>
+</figure>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Далее вы можете выбрать таймер для регулярного отображения статистики кучи и минимальную продолжительность паузы сборки мусора, чтобы при необходимости отфильтровывать короткие сборки.</p>
+
+<p class="justify-style">Затем вы можете использовать аргумент -p, за которым следует идентификатор процесса вашего приложения, чтобы просмотреть сведения о каждом сборщике мусора, как показано на <a href="#f-3-27">рисунке 3-27</a>.</p>
+
+<figure id="f-3-27" class="figure">
+    <img src="content/img/3-27.png" class="img-fluid" alt="Рисунок 3-27" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-27. dotnet-gcmon — список сведений о каждом сборщике мусора</figcaption>
+</figure>
+
+<p class="justify-style">В дополнение к инструменту командной строки dotnet-gcmon, в репозитории <a href="https://github.com/Maoni0/realmon">https://github.com/Maoni0/realmon</a> содержится отдельное приложение GCRealTimeMon, работающее только на Windows. Помимо функций, предоставляемых dotnet-gcmon, поколения имеют различные оттенки синего цвета (как в PerfView), а что более важно, оно показывает стек вызовов для инициированных сборок мусора, как это демонстрируется на <a href="#f-3-28">рисунке 3-28</a>, включая событие AllocationTick, соответствующее выделению памяти в LOH (Large Object Heap).</p>
+
+<figure id="f-3-28" class="figure">
+    <img src="content/img/3-28.png" class="img-fluid" alt="Рисунок 3-28" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-28. GCRealTimeMon – получение стека вызовов индуцированных GC</figcaption>
+</figure>
+
+<p class="justify-style">Обратите внимание, что этот инструмент необходимо запустить в оболочке с повышенными правами.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-9" class="h4 p-2">ProcDump, dotnet-dump</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
