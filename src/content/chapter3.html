@@ -1306,16 +1306,137 @@ dotnet-dump collect -p &lt;process_id&gt;
 <hr class="border-2">
 <p id="chapter3-2-11" class="h4 p-2">WinDbg</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Среди различных инструментов, представленных в этой главе, WinDbg безусловно является самым низкоуровневым. Вы можете использовать его для отладки ваших приложений .NET, самой среды CLR, а почему бы и нет — даже ядра операционной системы. Когда возникает необходимость анализировать, что происходит в приложении на основе его дампа памяти, WinDbg позволяет подробно изучать стеки потоков, содержимое кучи до уровня полей каждого объекта. Именно по этой причине мы иногда предпочитаем использовать WinDbg вместо более пользовательских инструментов, которые не предоставляют такого уровня детализации.</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Кроме того, сейчас доступна полностью обновленная версия WinDbg с пользовательским интерфейсом на базе WPF, который немного приятнее и настраиваемым, чем оригинальная версия из набора инструментов Debugging Tools в Windows SDK/DDK. WinDbg можно скачать в Windows Store или напрямую по ссылке <a href="https://aka.ms/windbg/download" target="_blank">https://aka.ms/windbg/download</a>.</p>
+
+<p class="justify-style">WinDbg также может быть отличным инструментом для экспериментов, помогающим понять среду выполнения .NET. Вы можете подключиться к своему управляемому приложению и отлаживать его (и саму CLR), как вы привыкли делать в Visual Studio, но, кроме того, вы сможете использовать команды SOS (подробнее об этом позже). Но в контексте повседневной работы, если вам и нужно использовать WinDbg, то, вероятно, для анализа ранее сгенерированного дампа памяти.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">WinDbg на самом деле является оберткой uI вокруг библиотеки DbgEng, которая отвечает за платформу отладки в Windows. Его истинная мощь в контексте анализа .NET заключается в расширениях, созданных специально для .NET, перечисленных ниже.</p>
+  </div>
+</div>
+
+<p class="justify-style">При запуске WinDbg щелкните меню Файл, чтобы решить, что именно следует отладить (см. <a href="#f-3-29">рисунок 3-29</a>):</p>
+
+<ul class="bullet-list ms-1">
+    <li>
+        <p class="justify-style">Повторное использование любого из последних действий — это особенно полезно при повторном присоединении к одному и тому же процессу или его запуске.</p>
+    </li>
+    <li>
+        <p class="justify-style">Запустить или присоединить к процессу — при выборе опции «Присоединить к процессу» будет отображен список всех запущенных процессов.</p>
+    </li>
+    <li>
+        <p class="justify-style">Открыть файлы дампа.</p>
+    </li>
+</ul>
+
+<figure id="f-3-29" class="figure">
+    <img src="content/img/3-29.png" class="img-fluid" alt="Рисунок 3-29" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-29. WinDbg Окно запуска отладки</figcaption>
+</figure>
+
+<p class="justify-style">WinDbg работает как собственный отладчик, поэтому он не понимает структуры и концепции, связанные с .NET. Вам нужно использовать расширения WinDbg, которые закроют этот пробел. Команда CLR создает самый важный из них, называемый SOS, с каждой версией CLR. Его название — это аббревиатура от Son of the Strike. Это связано с тем, что он является преемником отладочного инструмента Strike, который использовался во время разработки .NET Framework. Со старой версией SDK/DDK WinDbg вам приходилось вручную загружать его для дампов .NET Framework с помощью загадочной команды:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">.loadby sos clr</span></p>
+
+<p class="justify-style">Для ранних версий CoreCLR требовался еще один:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">.loadby sos coreclr</span></p>
+
+<p class="justify-style">По сути, эта команда сказала WinDbg искать sos.dll в той же папке, что и clr.dll или coreclr.dll. Для этих версий CLR файл был установлен вместе со средой выполнения. С текущей версией WinDbg правильная версия SOS будет автоматически загружена для вас: больше никаких загадочных команд для ввода!</p>
+
+<p class="justify-style">Однако вам нужно знать крошечную деталь реализации. В какой-то момент было решено, что sos.dll будет поставляться как отдельный двоичный файл, а не с каждой установкой CLR. WinDbg поддерживает эту модель, загружая правильную версию SOS для .NET Framework и поставляется с версией SOS в папке C:\Program Files\WindowsApps\Microsoft.WinDbg_1.2303.30001.0_ x64__8wekyb3d8bbwe\amd64\winext\sos.</p>
+
+<p class="justify-style">Если вы хотите загрузить более новую версию SOS, вам нужно выполнить несколько ручных шагов. Сначала установите инструмент CLI dotnet-sos на свой компьютер с помощью следующей команды:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">dotnet tool install dotnet-sos -g</span></p>
+
+<p class="justify-style">Затем установите соответствующий sos.dll:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">dotnet sos install</span></p>
+
+<p class="justify-style">Эта команда сообщает вам, где будет храниться sos.dll и какую команду следует ввести в WinDbg!</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Execute '.load C:\Users\&lt;your user&gt;\.dotnet\sos\sos.dll' to load SOS in your Windows debugger.</span></p>
+
+<p class="justify-style">Вернитесь в WinDbg и посмотрите, какая версия SOS была автоматически загружена с помощью команды .chain.</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+0:000> .chain
+Extension DLL search Path: ...
+Extension DLL chain:
+    sos: image 6.0.351802+ca25fd472e7dd6501d4a85973e0d0326c856880d,  
+    API 2.0.0, built Wed Oct 19 08:49:45 2022
+        [path: C:\Program Files\WindowsApps\Microsoft.WinDbg_1.2303.30001.0_
+        x64__8wekyb3d8bbwe\amd64\winext\sos\sos.dll]
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">При желании вы можете выгрузить эту версию с помощью команды .unload для очистки цепочки.</p>
+
+<p class="justify-style">Теперь пришло время загрузить последнюю версию, введя команду dotnet sos install:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">.load C:\Users\&it;your user&gt;\.dotnet\sos\sos.dll</span></p>
+
+<p class="justify-style">Проверьте, установлена ​​ли правильная версия, введя .chain еще раз.</p>
+
+<p class="justify-style">Стив Джонсон написал свое расширение для SOS под названием SOSEX. Его можно загрузить с <a href="https://www.stevestechspot.com/default.aspx" target="_blank">https://www.stevestechspot.com/default.aspx</a>. Оно добавляет более мощные функции, когда дело доходит до отладки управляемого кода и дампов памяти, но оно поддерживает только .NET Framework и может случайно зависнуть с дампами .NET Core.</p>
+
+<p class="justify-style">NetExt (от Родни Вианы, доступно по адресу <a href="https://github.com/rodneyviana/netext" target="_blank">https://github.com/rodneyviana/netext</a>) и MEX (Managed-code Debugging Extension, доступно по адресу <a href="https://www.microsoft.com/en-us/download/details.aspx?id=53304" target="_blank">www.microsoft.com/en-us/download/details.aspx?id=53304</a>) — еще два расширения, которые позволяют нам делать более сложные вещи, чем два предыдущих.</p>
+
+<p class="justify-style">Чтобы загрузить расширение, введите ту же команду .load, которую мы представили для SOS, но на этот раз с путем к файлу расширения .dll в качестве параметра, например следующим образом:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">.load c:\Tools\Dumps\Extensions\Sosex\64bit\sosex.dll</span></p>
+
+<p class="justify-style">Вам нужно позаботиться о том, какую DLL загружать, независимо от того, из какого приложения — из 32- или 64-разрядного приложения: всегда выбирайте одну и ту же разрядность. В случае несоответствия, вы должны получить следующую ошибку для команды .load:</p>
+
+<figure class="figure">
+    <pre class="cli">
+        <div class="px-5 border border-secondary">
+            <code class="language-cli">
+The call to LoadLibrary(C:\Tools\dumps\extensions\NetExt-2.1.65.5000\x86\netext.dll) failed, 
+Win32 error 0n193
+    "%1 is not a valid Win32 application."
+            </code>
+        </div>
+    </pre>
+</figure>
+
+<p class="justify-style">Проверьте конфигурацию отладчика и/или доступ к сети.</p>
+
+<p class="justify-style">В этом примере дамп был создан из 64-разрядного приложения, а библиотека DLL — это версия расширения x86.</p>
+
+<p class="justify-style">После загрузки расширения его экспортированные команды можно вызывать по имени с префиксом !. Например, SOS экспортирует команду threads для перечисления управляемых потоков; поэтому вам нужно ввести !threads. Но что, если несколько расширений экспортируют команду с одинаковым именем? Правило простое: будет вызвана команда расширения, находящегося наверху цепочки. Существует очевидный случай, когда вы действительно хотите ограничить область действия команды расширением: команда help обычно экспортируется всеми расширениями для документирования всех их команд. В этом случае просто добавьте к имени команды префикс имени расширения, например</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">!sos.help</span></p>
+
+<p class="justify-style">Это позволит вам получить доступ к справке любого расширения, не нарушая цепочку расширений.</p>
+
+<p class="justify-style">Есть еще один полезный трюк, который можно использовать с WinDbg – окна дерева команд. Поскольку вводить команды снова и снова довольно обременительно, вы можете создать файл со структурированным списком доступных команд. Затем, используя команду .cmdtree &lt;file&gt;, вы можете создавать специальные окна со всеми этими командами, доступными просто щелчком.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-12" class="h4 p-2">dotnet-dump для анализа</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Ранее мы описали, как можно использовать dotnet-dump для дампа памяти приложения .NET Core с помощью его команды collect. С командой analyze, за которой следует путь к файлу дампа, dotnet-dump запускает интерактивный сеанс, в котором можно вводить те же команды, что и SOS. В отличие от WinDbg, вам не нужно добавлять к командам префикс в виде символа "!".</p>
+
+<p class="justify-style">Даже если WinDbg может загрузить дамп памяти, сгенерированный в Linux, если вам нужно проанализировать такой дамп непосредственно на компьютере с Linux, dotnet-dump analyze спасет вас, поскольку это кроссплатформенный инструмент CLI!</p>
 
 <hr class="border-2">
 <p id="chapter3-2-13" class="h4 p-2">Дизассемблеры и декомпиляторы</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
