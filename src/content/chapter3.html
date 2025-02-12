@@ -1446,10 +1446,63 @@ Win32 error 0n193
 
 <hr class="border-2">
 <p id="chapter3-2-14" class="h4 p-2">BenchmarkDotNet</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Если вас волнует производительность, вам часто нужно измерять время выполнения или распределение определенных фрагментов кода. Это будет особенно полезно в этой книге, потому что мы сравним эффекты различных методов оптимизации. Библиотека BenchmarkDotNet делает именно это и даже больше. Вы можете использовать ее для тестирования производительности каждого метода и удобно сравнивать их. Вы можете тестировать с различными версиями .NET, конфигурациями JIT и GC и т. д. и т. п.</p>
+
+<p class="justify-style">Написание микро-бенчмарков — сложная задача, и эта библиотека заботится о том, чтобы избежать любых ошибок, которые вы можете допустить. Она делит выполнение на несколько этапов, чтобы позаботиться о разминке и измерить базовые накладные расходы. Тесты проводятся во многих итерациях, а количество итераций автоматически корректируется в соответствии с характеристиками вашего кода. Все измерения обрабатываются статистически. Рассчитываются процентили, а также обнаруживается мультимодальное распределение данных (включая визуальное представление упрощенной гистограммы). В результате вы получаете мощный, но очень простой в использовании инструмент.</p>
+
+<p class="justify-style">Подготовка простого теста проиллюстрирована в <a href="#l-3-5">листинге 3-5</a>. Как вы видите, большая часть конфигурации выполняется через атрибуты. Вы также можете добавлять параметры для создания различных вариаций бенчмарка (например, N в нашем примере).</p>
+
+<figure id="l-3-5" class="figure">
+    <pre class="code px-5 border border-secondary">
+      <code class="language-csharp">
+[BenchmarkDotNet.Attributes.Jobs.ShortRunJob]
+[MemoryDiagnoser]
+public class TailCallTest
+{
+    [Params(5, 10, 20)]
+    public int N { get; set; }
+    [Benchmark]
+    public long FibonacciRecursive()
+    {
+        return FibonacciRecursiveHelper(N);
+    }
+    private long FibonacciRecursiveHelper(long n)
+    {
+        if (n &lt; 3)
+            return 1;
+        return FibonacciRecursiveHelper(n - 2) + FibonacciRecursiveHelper(n - 1);
+    }
+}
+      </code>
+    </pre>
+    <figcaption class="figure-caption">Листинг 1-9. Пример теста BenchmarkDotnet</figcaption>
+  </figure>
+
+<p class="justify-style">Чтобы выполнить тест, представленный в <a href="#l-3-5">листинге 3-5</a>, достаточно просто вызвать BenchmarkRunner. Run&lt;TailCallTest&gt;() в вашей программе. Результат этого теста (см. <a href="#f-3-31">рисунок 3-31</a>) показывает среднее время выполнения каждого метода для каждого параметра и для двух разных JIT (Just In Time) компиляторов, что приводит к богатым статистическим данным о результатах.</p>
+
+<figure id="f-3-31" class="figure">
+    <img src="content/img/3-31png" class="img-fluid" alt="Рисунок 3-31" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-31. Результаты теста BenchmarkDotnet</figcaption>
+</figure>
+
+<p class="justify-style">Вы также можете расширить библиотеку дополнительными регистраторами, анализаторами, диагностами и т. д. Два из них особенно интересны для этой книги. GC и Memory Allocation Diagnoser (MemoryDiagnoser) анализируют, сколько сборок мусора произошло и сколько выделений было сделано во время теста. Также есть Hardware Counters Diagnoser (HardwareCounters), который доступен только в Windows и может предоставить глубокое понимание статистики, связанной с оборудованием, такой как промахи кэша ЦП.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-15" class="h4 p-2">Инструменты от авторов</p>
+
+<p class="justify-style">Мы не могли закончить этот раздел, не упомянув наши собственные инструменты, созданные на основе опыта, полученного при написании этой книги.</p>
+
+<p class="h5 p-2">GummyCat</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
