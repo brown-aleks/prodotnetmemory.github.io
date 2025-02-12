@@ -1482,7 +1482,7 @@ public class TailCallTest
 <p class="justify-style">Чтобы выполнить тест, представленный в <a href="#l-3-5">листинге 3-5</a>, достаточно просто вызвать BenchmarkRunner. Run&lt;TailCallTest&gt;() в вашей программе. Результат этого теста (см. <a href="#f-3-31">рисунок 3-31</a>) показывает среднее время выполнения каждого метода для каждого параметра и для двух разных JIT (Just In Time) компиляторов, что приводит к богатым статистическим данным о результатах.</p>
 
 <figure id="f-3-31" class="figure">
-    <img src="content/img/3-31png" class="img-fluid" alt="Рисунок 3-31" max-width="600">
+    <img src="content/img/3-31.png" class="img-fluid" alt="Рисунок 3-31" max-width="600">
     <figcaption class="figure-caption">Рисунок 3-31. Результаты теста BenchmarkDotnet</figcaption>
 </figure>
 
@@ -1495,18 +1495,40 @@ public class TailCallTest
 
 <p class="h5 p-2">GummyCat</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">GummyCat, созданный Кевином Госсом, представляет собой инструмент, который обеспечивает визуализацию активности сборщика мусора с эстетикой «программы дефрагментации» (см. <a href="#f-3-32">рисунок 3-32</a>).</p>
 
-<p class="justify-style">Текст ...</p>
+<figure id="f-3-32" class="figure">
+    <img src="content/img/3-32.png" class="img-fluid" alt="Рисунок 3-32" max-width="600">
+    <figcaption class="figure-caption">Рисунок 3-32. Визуализация областей GC в GummyCat</figcaption>
+</figure>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Хотя он работает с сегментами, на самом деле он был разработан для использования с регионами. Каждый квадрат представляет 1 МБ памяти, а цвет указывает на логическое назначение этой памяти GC (gen 0, gen 1, gen 2, LOH, POH, …). Это отличный способ увидеть эволюцию куч с течением времени и лучше понять, как GC реорганизует свою память с каждой сборкой.</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Инструмент можно установить из командной строки с помощью dotnet tool install --global gummycat.</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Более подробное описание инструмента можно найти на сайте <a href="https://minidump.net/gummycat/" target="_blank">https://minidump.net/gummycat/</a>.</p>
+
+<p class="h5 p-2">dotnet-counters-ui</p>
+
+<p class="justify-style">Этот кроссплатформенный пользовательский интерфейс от Конрада Кокосы позволяет вам наблюдать за счетчиками .NET на Windows, Linux и macOS. Более подробную информацию можно найти на <a href="https://github.com/kkokosa/dotnet-counters-ui" target="_blank">https://github.com/kkokosa/dotnet-counters-ui</a>.</p>
+
+<p class="h5 p-2">dotnet-gcstats</p>
+
+<p class="justify-style">Этот инструмент .NET CLI от Кристофа Насара показывает в реальном времени детали запущенной сборки мусора в любом приложении .NET. Используйте <span class="fw-bold fst-italic">dotnet tool install --global dotnet-gcstats</span> для его установки. Исходный код доступен на <a href="https://github.com/chrisnas/GCStats" target="_blank">https://github.com/chrisnas/GCStats</a>.</p>
+
+<p class="h5 p-2">dotnet-fullgc</p>
+
+<p class="justify-style">С помощью этого инструмента .NET CLI от Кристофа Насара вы сможете запустить полную сборку мусора в любом приложении .NET. Используйте <span class="fw-bold fst-italic">dotnet tool install --global dotnet-fullgc</span> для его установки. Исходный код доступен на <a href="https://github.com/chrisnas/GCStats" target="_blank">https://github.com/chrisnas/GCStats</a>.</p>
 
 <hr class="border-2">
 <p id="chapter3-2-16" class="h4 p-2">Коммерческие инструменты</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
