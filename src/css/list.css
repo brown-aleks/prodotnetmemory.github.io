@@ -1,4 +1,7 @@
-
+ul.tab-list {
+  list-style-type: none;
+  padding-left: 0;
+}
 
 /*маркированный список */
 ul.bullet-list  {
