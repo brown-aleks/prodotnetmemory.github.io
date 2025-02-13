@@ -124,7 +124,57 @@
                     </nav>
                 </ul>
             </nav>
-        <li class="nav-item-1"><a class="nav-link bi-book" href="#chapter4" onclick="loadContent('chapter4.html', 'chapter4')"> Глава 4</a></li>
+        <li class="nav-item-1"><a class="nav-link bi-book" href="#chapter4" onclick="loadContent('chapter4.html', 'chapter4')">Глава 4: Основы .NET</a></li>
+            <nav class="nav nav-pills flex-column ms-1">
+                <ul>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-1" onclick="loadContent('chapter4.html', 'chapter4-1')">Версии .NET</a></li>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-2" onclick="loadContent('chapter4.html', 'chapter4-2')">Внутреннее устройство .NET</a></li>
+                    <nav>
+                        <ul>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-2-1" onclick="loadContent('chapter4.html', 'chapter4-2-1')">Пример программы в деталях</a></li>
+                        </ul>
+                    </nav>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-3" onclick="loadContent('chapter4.html', 'chapter4-3')">Сборки и домены приложений</a></li>
+                    <nav class="nav nav-pills flex-column ms-1">
+                        <ul>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-3-1" onclick="loadContent('chapter4.html', 'chapter4-3-1')">Собираемые сборки</a></li>
+                        </ul>
+                    </nav>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-4" onclick="loadContent('chapter4.html', 'chapter4-4')">Области памяти процесса</a></li>
+                    <nav class="nav nav-pills flex-column ms-1">
+                        <ul>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-4-1" onclick="loadContent('chapter4.html', 'chapter4-4-1')">Сценарий 4-1 — Насколько велика моя программа в памяти?</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-4-2" onclick="loadContent('chapter4.html', 'chapter4-4-2')">Сценарий 4-2 — Использование собственной памяти моей программой продолжает расти</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-4-3" onclick="loadContent('chapter4.html', 'chapter4-4-3')">Сценарий 4-3 — Использование виртуальной памяти моей программой продолжает расти</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-4-4" onclick="loadContent('chapter4.html', 'chapter4-4-4')">Сценарий 4-4 — Использование управляемой памяти моей программой продолжает расти с ростом количества сборок</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-4-5" onclick="loadContent('chapter4.html', 'chapter4-4-5')">Сценарий 4-5 — Моя программа не может выгрузить плагины</a></li>
+                        </ul>
+                    </nav>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-5" onclick="loadContent('chapter4.html', 'chapter4-5')">Система типов</a></li>
+                    <nav class="nav nav-pills flex-column ms-1">
+                        <ul>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-5-1" onclick="loadContent('chapter4.html', 'chapter4-5-1')">Категории типов</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-5-2" onclick="loadContent('chapter4.html', 'chapter4-5-2')">Хранилище типов</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-5-3" onclick="loadContent('chapter4.html', 'chapter4-5-3')">Значимые типы</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-5-4" onclick="loadContent('chapter4.html', 'chapter4-5-4')">Ссылочные типы</a></li>
+                        </ul>
+                    </nav>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-6" onclick="loadContent('chapter4.html', 'chapter4-6')">Строки</a></li>
+                    <nav class="nav nav-pills flex-column ms-1">
+                        <ul>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-6-1" onclick="loadContent('chapter4.html', 'chapter4-6-1')">Интернирование строк</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-6-2" onclick="loadContent('chapter4.html', 'chapter4-6-2')">Сценарий 4-6 — Использование памяти моей программой слишком большое</a></li>
+                    </nav>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-7" onclick="loadContent('chapter4.html', 'chapter4-7')">Упаковка и Распаковка</a></li>
+                    <li class="nav-item-2"><a class="nav-link" href="#chapter4-8" onclick="loadContent('chapter4.html', 'chapter4-8')">Передача по ссылке</a></li>
+                    <nav class="nav nav-pills flex-column ms-1">
+                        <ul>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-8-1" onclick="loadContent('chapter4.html', 'chapter4-8-1')">Передача по ссылке экземпляра значимого типа</a></li>
+                            <li class="nav-item-3"><a class="nav-link" href="#chapter4-8-2" onclick="loadContent('chapter4.html', 'chapter4-8-2')">Передача по ссылке экземпляра ссылочного типа</a></li>
+                        </ul>
+                    </nav>
+                </ul>
+            </nav>
     </ul>
 </nav>
 
@@ -198,4 +248,39 @@ Chapter 2: Low-Level Memory Management
         Коммерческие инструменты  
     Резюме  
     Правило 5 — Раннее измерение работы сборщика мусора (GC)
+-->
+
+<!--
+Глава 4: Основы .NET
+    Версии .NET
+    Внутреннее устройство .NET
+        Пример программы в деталях
+    Сборки и домены приложений
+        Собираемые сборки
+    Области памяти процесса
+        Сценарий 4-1 — Насколько велика моя программа в памяти?
+        Сценарий 4-2 — Использование собственной памяти моей программой продолжает расти
+        Сценарий 4-3 — Использование виртуальной памяти моей программой продолжает расти
+        Сценарий 4-4 — Использование управляемой памяти моей программой продолжает расти с ростом количества сборок
+        Сценарий 4-5 — Моя программа не может выгрузить плагины
+    Система типов
+        Категории типов
+        Хранилище типов
+        Значимые типы
+        Ссылочные типы
+    Строки
+        Интернирование строк
+        Сценарий 4-6 — Использование памяти моей программой слишком большое
+    Упаковка и Распаковка
+    Передача по ссылке
+        Передача по ссылке экземпляра значимого типа
+        Передача по ссылке экземпляра ссылочного типа
+    Null
+    Локализация данных типа
+    Статические данные
+        Статические поля
+        Внутренние статические данные
+    Резюме
+        Структуры
+        Классы
 -->
