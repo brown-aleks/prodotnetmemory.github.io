@@ -107,18 +107,348 @@
   </div>
 </div>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Подводя итог, давайте взглянем на общую картину среды выполнения .NET, выполняющей наше приложение (см. <a href="#f-4-1">Рисунок 4-1</a>).</p>
 
-<p class="justify-style">Текст ...</p>
+<figure id="f-4-1" class="figure">
+  <img src="content/img/4-1.png" class="img-fluid" alt="Рисунок 4-1" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-1. Исходный код (текстовые файлы) компилируется в Common Intermediate Language (CIL, бинарные файлы). Затем на целевой машине с установленным .NET он выполняется самой средой выполнения. Механизм выполнения (Execution Engine, EE) берет CIL из бинарных файлов и преобразует его в памяти в машинный код. Сборщик мусора (Garbage Collector, GC) управляет временем жизни объектов и использованием памяти на уровне операционной системы.</figcaption>
+</figure>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Вы пишете свой код в редакторе по вашему выбору — Visual Studio, Visual Studio Code или любом другом. В результате вы получаете проект, содержащий набор исходных файлов. Это, проще говоря, текстовые файлы с исходным кодом вашей программы, написанной на C#, VB.NET, F# или любом другом поддерживаемом языке.</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style">Вы компилируете свой проект с помощью соответствующего компилятора. В результате вы получаете набор файлов (сборок), содержащих двоичный код, представляющий инструкции на языке Common Intermediate Language (CIL). Этот код представляет вашу программу как набор низкоуровневых инструкций, работающих на «виртуальной» стековой машине (см. Главу 1). Также могут быть другие сборки, содержащие библиотеки, которые вы используете в своей программе. Эти сборки могут быть распространены среди других пользователей, например, в виде ZIP-архива или через установщик.</p>
+  </li>
+  <li>
+    <p class="justify-style">Запуск приложения — это, очевидно, самая важная часть, которая может быть разделена на следующие этапы:</p>
+  </li>
+  <ul>
+    <li>
+      <p class="justify-style">Для .NET Framework: Исполняемый файл содержит загрузочный код, который загружает соответствующую версию среды выполнения .NET с поддержкой операционной системы Windows.</p>
+    </li>
+    <li>
+      <p class="justify-style">Для .NET Core: Кроссплатформенное решение не зависит от взаимодействия с Windows. Вы можете напрямую запустить исполняемый файл (даже на Linux) или использовать команду «dotnet» с файлом .dll в качестве параметра. Это запустит среду выполнения.</p>
+    </li>
+    <li>
+      <p class="justify-style">Среда выполнения .NET загрузит текущую необходимую часть кода CIL из сборки и передаст его JIT-компилятору.</p>
+    </li>
+    <li>
+      <p class="justify-style">JIT-компилятор скомпилирует код CIL в машинный код, оптимизированный для платформы, на которой он выполняется. Дополнительно он внедрит различные вызовы в механизм выполнения (Execution Engine), чтобы обеспечить хорошее взаимодействие между вашим кодом и средой выполнения .NET.</p>
+    </li>
+    <li>
+      <p class="justify-style">С этого момента ваш код выполняется как обычный нативный машинный код. Разница заключается в том, что, как упоминалось ранее, существует взаимодействие со средой выполнения.</p>
+    </li>
+  </ul>
+</ul>
+
+<p class="justify-style">Сейчас, вероятно, хорошее время, чтобы развеять некоторые распространенные заблуждения о среде .NET:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style">.NET не является виртуальной машиной в обычном понимании: Среда выполнения .NET не создает изолированного окружения и не симулирует какую-либо конкретную архитектуру или машину. На самом деле, среда выполнения .NET использует встроенные системные ресурсы, такие как управление памятью операционной системы, включая кучу (heap) и стек (stack), процессы и потоки, и так далее. Затем она добавляет некоторые дополнительные функции поверх них (автоматическое управление памятью — одна из них).</p>
+  </li>
+  <li>
+    <p class="justify-style">Нет единой среды выполнения .NET, работающей на машине: есть один двоичный дистрибутив, но он загружается и выполняется для каждого запущенного приложения .NET. Например, сборка мусора из процесса A не влияет напрямую на сборку мусора из процесса B. Очевидно, что существует некоторое совместное использование ресурсов на уровне оборудования и операционной системы, но в целом каждая среда выполнения .NET не знает о каком-либо другом управляемом приложении, запущенном их собственными экземплярами среды выполнения .NET. Фактически, вы можете разместить среду выполнения .NET внутри неуправляемого приложения (что имеет место в случае возможностей SQL Server CLR). Более того, вы можете разместить как среды выполнения .NET Framework, так и .NET Core в одном процессе, хотя практического использования такого поведения немного.</p>
+  </li>
+</ul>
 
 <hr class="border-2">
 <p id="chapter4-2-1" class="h4 p-2">Пример программы в деталях</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Давайте теперь пошагово рассмотрим процесс компиляции и запуска простого приложения Hello World (см. <a href="#l-4-1">Листинг 4-1</a>), чтобы лучше понять некоторые внутренние аспекты .NET. Это позволит вам увидеть некоторые базовые концепции, которые понадобятся позже. Любой, кто когда-либо изучал C#, вероятно, узнает этот пример, единственная цель которого — вывести короткий текст на консоль.</p>
+
+<p class="justify-style">Мы будем использовать его как наш полигон для запуска под .NET 8 на Windows. Очевидно, мы не будем углубляться слишком сильно, так как нас в основном интересуют вопросы управления памятью. Если вам действительно интересно, как среда выполнения .NET загружает себя, управляет типами и подобными темами, мы снова рекомендуем замечательные книги, упомянутые ранее.</p>
+
+<figure id="l-4-1" class="figure">
+  <pre class="code border border-secondary">
+    <code class="language-csharp">
+      using System;
+      namespace HelloWorld
+      {
+        class Program
+        {
+          static void Main(string[] args)
+          {
+            Console.WriteLine("Hello world!");
+          }
+        }
+      }
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-1. Пример программы Hello World, написанной на языке C#</figcaption>
+</figure>
+
+<p class="justify-style">Пример кода из <a href="#l-4-1">Листинга 4-1</a> в проекте CoreCLR.HelloWorld, когда компилируется компилятором C# (Roslyn с Visual Studio 2022), создаст один DLL-файл, который в этом примере называется CoreCLR.HelloWorld.dll. Этот файл содержит все данные, необходимые .NET для запуска этой программы. Вы можете подробно изучить его, например, открыв в dnSpy. Затем перейдите по различным декодированным разделам файла (см. <a href="#f-4-2">Рисунок 4-2</a>):</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style">Метаданные, описывающие себя (в терминах описания двоичного файла Windows или Linux) — называемые заголовками DOS и PE в случае двоичного файла Windows, показанного на <a href="#f-4-2">рисунке 4-2</a>.</p>
+  </li>
+  <li>
+    <p class="justify-style">Метаданные, описывающие содержимое, связанное с .NET, включая все типы, объявленные в сборке, их методы и другие свойства (отображаются как поток хранения #0 с именем #~)</p>
+  </li>
+  <li>
+    <p class="justify-style">Список ссылок на другие необходимые файлы, в которых определены ссылочные типы, например, сборка System.Console для вызова Console.WriteLine</p>
+  </li>
+  <li>
+    <p class="justify-style">Двоичный поток объявленных типов и их методов, закодированных в виде байтов, представляющих общий промежуточный язык.</p>
+  </li>
+</ul>
+
+<figure id="f-4-2" class="figure">
+  <img src="content/img/4-2.png" class="img-fluid" alt="Рисунок 4-2" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-2. Содержимое двоичного файла CoreCLR.HelloWorld.dll – результат компиляции программы из листинга 4-1</figcaption>
+</figure>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-body">
+    <p class="card-text justify-style">dnSpy доступен по адресу <a href="https://github.com/0xd4d/dnSpy" target="_blank">https://github.com/0xd4d/dnSpy</a>. Подробнее об использовании читайте в Главе 3.</p>
+  </div>
+</div>
+
+<p class="justify-style">Каждый метод или тип имеет уникальный идентификатор, называемый токеном, и его местоположение в файле можно определить благодаря упомянутым ранее потокам метаданных. Благодаря этому мы можем идентифицировать области файла, содержащие тело каждого метода. Например, чтобы увидеть тело метода Main, щелкните его правой кнопкой мыши в Assembly Explorer и выберите опцию «Show Method Body in the Hex Editor» в контекстном меню (см. <a href="#f-4-3">Рисунок 4-3</a>).</p>
+
+<figure id="f-4-3" class="figure">
+  <img src="content/img/4-3.png" class="img-fluid" alt="Рисунок 4-3" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-3. Несколько байтов, содержащих инструкции на общем промежуточном языке для метода Program.Main (стрелка добавлена ​​для ясности)</figcaption>
+</figure>
+
+<p class="justify-style">Конечно, понять значение этих необработанных байтов действительно сложно! Однако CIL каждого метода можно декодировать в более читаемую форму благодаря декомпиляции, упомянутой в главе 3: выберите метод Main в Assembly Explorer и выберите IL как язык декомпиляции в выпадающем списке на панели инструментов dnSpy.</p>
+
+<p class="justify-style">Результат декомпиляции типа Program из CoreCLR.HelloWorld.dll показан в <a href="#l-4-2">Листинге 4-2</a> (конструктор был удален для ясности). В комментариях мы можем увидеть оригинальный байт-код для указанных инструкций (например, байт 2A представляет инструкцию CIL ret), так что теперь мы можем полностью понять байты 2E7201000070280C00000A2A, выделенные на <a href="#f-4-3">рисунке 4-3</a>.</p>
+
+<p class="justify-style">Если мы посмотрим на простой CIL-код метода Main (см. листинг 4-2), мы увидим, как он был скомпилирован в код для стековой машины:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">ldstr "Hello World!"</span>: Ссылка на строковый литерал помещается в стек вычислений.</p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">call System.Console::WriteLine</span>: Static method is called, taking the first argument 
+      from the evaluation stack</p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">ret</span>: Метод завершает выполнение (без возвращаемого значения, так как в стеке вычислений ничего нет).</p>
+  </li>
+</ul>
+
+<figure id="l-4-2" class="figure">
+  <pre class="code border border-secondary px-5">
+    <code class="language-IL">
+// Token: 0x02000002
+.class private auto ansi beforefieldinit HelloWorld.Program
+      extends [System.Runtime]System.Object
+{
+  // Token: 0x06000001
+  .method private hidebysig static
+    void Main (
+      string[] args
+    ) cil managed
+  {
+    // Header Size: 1 byte
+    // Code Size: 11 (0xB) bytes
+    .maxstack 8
+    .entrypoint
+    ldstr     
+    "Hello World!"
+    call      
+    void [System.Console]System.Console::WriteLine(string)
+    ret
+  } // end of method Program::Main
+} // end of class HelloWorld.Program
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-2. Пример программы из листинга 4-1, преобразованной в Common Intermediate Language. Вывод получен с помощью инструмента dnSpy.</figcaption>
+</figure>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Если внимательно посмотреть на код из <a href="#l-4-2">листинга 4-2</a>, можно увидеть инструкцию <span class="fw-bold fst-italic">.maxstack 8</span>, которая, кажется, связана с выполнением программы. Однако это не инструкция CIL. Такое описание метаданных может использоваться различными инструментами для проверки безопасности кода. <span class="fw-bold fst-italic">maxstack</span> указывает, сколько элементов может быть помещено в стек вычислений во время выполнения метода. Обратите внимание, что это указывает на количество элементов, а не на их размер. Инструмент, такой как PEVerify, может использовать эту информацию для сравнения с тем, что хочет сделать CIL-код метода. Однако в настоящее время среда выполнения использует метаданные <span class="fw-bold fst-italic">maxstack</span> очень ограниченно, так как JIT самостоятельно вычисляет такие ограничения. Это в основном оставлено для сторонних инструментов, которые гипотетически могут зависеть от этого.</p>
+
+    <p class="card-text justify-style">Если вам интересно, читайте подробнее на сайте <a href="https://github.com/dotnet/runtime/issues/62913" target="_blank">https://github.com/dotnet/runtime/issues/62913</a>.</p>
+  </div>
+</div>
+
+<p class="justify-style">Рассматривая стековую машину .NET, следует упомянуть важное понятие местоположений (locations). Хранение различных значений, необходимых для выполнения программы, может быть очень разным:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style">Локальные переменные в методе</p>
+  </li>
+  <li>
+    <p class="justify-style">Аргументы метода</p>
+  </li>
+  <li>
+    <p class="justify-style">Поле экземпляра другого значения</p>
+  </li>
+  <li>
+    <p class="justify-style">Статическое поле (внутри класса, интерфейса или модуля)</p>
+  </li>
+  <li>
+    <p class="justify-style">Локальный пул памяти</p>
+  </li>
+  <li>
+    <p class="justify-style">Временное хранение в стеке вычислений</p>
+  </li>
+</ul>
+
+<p class="justify-style">Как каждое местоположение отображается в конкретную компьютерную архитектуру — это исключительная ответственность JIT-компилятора, и мы скоро углубимся в эту тему.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">В экосистеме .NET в настоящее время доступно несколько движков JIT-компиляции:</p>
+    <ul class="bullet-list ms-1">
+      <li>
+        <p class="justify-style">Устаревший x86 JIT, используемый средой выполнения .NET (до версии 4.5.2) и .NET Core 1.0/1.1 для архитектуры x86 (32-битные версии).</p>
+      </li>
+      <li>
+        <p class="justify-style">Устаревший x64 JIT, используемый средой выполнения .NET до версии 4.5.2.</p>
+      </li>
+      <li>
+        <p class="justify-style">RyuJIT, используемый .NET Core 2.0 (и более поздними версиями) и .NET Framework 4.6 (и более поздними версиями) для 32- и 64-битной компиляции.</p>
+      </li>
+      <li>
+        <p class="justify-style">Mono JIT для платформ x86 и x64.</p>
+      </li>
+    </ul>
+    <p class="card-text justify-style">Здесь мы сосредоточимся только на движке RyuJIT.</p>
+  </div>
+</div>
+
+<p class="justify-style">Теперь давайте попробуем использовать WinDbg, чтобы увидеть, как IL-код программы был преобразован в машинные инструкции с помощью JIT в случае 64-битной Windows. Вам нужно запустить приложение, чтобы инициировать загрузку среды выполнения и JIT-компиляцию необходимых методов.</p>
+
+<p class="justify-style">Выберите меню <span class="fw-bold fst-italic">File</span> и нажмите <span class="fw-bold fst-italic">Launch executable (advanced)</span> на панели <span class="fw-bold fst-italic ">Start Debugging</span>, затем укажите следующие параметры (предполагая, что решение находится в <span class="fw-bold fst-italic">C:\Projects</span>):</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style">Executable: <span class="fw-bold fst-italic">C:\Program Files\dotnet\dotnet.exe</span></p>
+  </li>
+  <li>
+    <p class="justify-style">Arguments: <span class="fw-bold fst-italic"> \CoreCLR.HelloWorld.dll</span></p>
+  </li>
+  <li>
+    <p class="justify-style">Start directory: <span class="fw-bold fst-italic">C:\Projects\CoreCLR.HelloWorld\bin\Release\net8.0</span></p>
+  </li>
+</ul>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Многие предпочитают запускать WinDbg из командной строки для отладки программ, используя следующую команду:</p>
+    <p class="left-style"><span class="fw-bold fst-italic">windbgx C:\ProgramFiles\dotnet\dotnet.exe C:\Projects\CoreCLR.HelloWorld\bin\x64\Release\net8.0\CoreCLR.HelloWorld.dll</span></p>
+  </div>
+</div>
+
+<p class="justify-style">После нажатия кнопки **Debug** приложение Hello World запустится, и его выполнение сразу же прервется. Теперь вам нужно установить точку останова, которая остановит программу непосредственно перед завершением (после вывода сообщения "Hello World!") с помощью следующей команды:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">bp coreclr!EEShutDown</span></p>
+
+<p class="justify-style">Не удивляйтесь, если вы получите следующий результат:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Bp expression 'coreclr!EEShutDown' could not be resolved, adding deferred bp</span></p>
+
+<p class="justify-style">Это происходит потому, что coreclr.dll не загружен, когда WinDbg прерывает выполнение приложения.</p>
+
+<p class="justify-style">Теперь нажмите Go (или введите команду g) и подождите немного, пока не сработает точка останова. Помните, что расширение SOS должно было автоматически загрузиться WinDbg. Найдите метод Main, используя следующую команду:</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">!name2ee CoreCLR.HelloWorld.dll!HelloWorld.Program.Main</span></p>
+
+<p class="justify-style">Следующий вывод показывает, что JIT-код для метода Main расположен по адресу 00007ffb47df0ab0:</p>
+
+<figure class="figure">
+  <pre class="cli">
+      <div class="px-5 border border-secondary">
+          <code class="language-cli">
+Module:      00007ffb47ec2448
+Assembly:    CoreCLR.HelloWorld.dll
+Token:       0000000006000001
+MethodDesc:  00007ffb47ec4398
+Name:        HelloWorld.Program.Main(System.String[])
+JITTED Code Address: 00007ffb47df0ab0
+          </code>
+      </div>
+  </pre>
+</figure>
+
+<p class="justify-style">Вы можете использовать команду <span class="fw-bold fst-italic">!U 00007ffb47df0ab0</span>, чтобы увидеть сгенерированный ассемблерный код, и результаты представлены в <a href="#l-4-3">листинге 4-3</a>. Вот основные шаги выполнения, соответствующие вызову <span class="fw-bold fst-italic">Console.WriteLine</span>:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">mov rcx, 266E35F04E8h</span>: Сохранить адрес <span class="fw-bold fst-italic">266E35F04E8h</span> в регистре <span class="fw-bold fst-italic">rcx</span> (это указатель на строковый литерал "Hello World!", который используется здесь из-за механизма "интернирования строк", объясненного позже).</p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">call qword ptr [00007ffb47ef17c8]</span>: Вызвать статический метод <span class="fw-bold fst-italic">Console.WriteLine</span>, передавая текст для отображения в регистре <span class="fw-bold fst-italic">rcx</span>.</p>
+  </li>
+</ul>
+
+<p class="justify-style">Остальное соответствует прологу и эпилогу метода для сохранения и восстановления используемых регистров (в данном случае <span class="fw-bold fst-italic">rcx</span>).</p>
+
+<br
+<figure id="l-4-3" class="figure">
+  <pre class="code border border-secondary px-5">
+    <code class="language-asm">
+Normal JIT generated code
+HelloWorld.Program.Main(System.String[])
+ilAddr is 000002264CA62050 pImport is 0000024C516FCDC0
+Begin 00007FFB47DF0AB0, size 25
+
+&gt;&gt;&gt; 00007ffb`47df0ab0 55              push    rbp
+sub     rsp,20h
+lea     rbp,[rsp+20h]
+mov     qword ptr [rbp+10h],rcx
+mov rcx,266E35F04E8h ("Hello world!")
+call    qword ptr [00007ffb`47ef17c8]
+nop
+add     rsp,20h
+pop     rbp
+ret
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-3. Машинный код, полученный с помощью JIT-компиляции кода из <a href="#l-4-2">листинга 4-2</a></figcaption>
+</figure>
+
+<p class="justify-style">Вот так наша простая программа на C# была преобразована через CIL в исполняемый код. Местоположение в стеке вычислений, используемое инструкцией <span class="fw-bold fst-italic">ldstr</span> и передаваемое в <span class="fw-bold fst-italic">Console.WriteLine</span>, было преобразовано JIT-компилятором в регистр процессора <span class="fw-bold fst-italic">rcx</span>. Внутри метода <span class="fw-bold fst-italic">>Main</span> нет выделения памяти в стеке или куче — но, пожалуйста, помните, что некоторые выделения памяти уже были выполнены самой средой выполнения и сборками фреймворка (вы думаете, массив строк, передаваемый в метод <span class="fw-bold fst-italic">Main</span>, появился из ниоткуда?).</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Поскольку существует множество возможных способов использования регистров и памяти для передачи аргументов при вызовах функций, существуют стандартизированные подходы, называемые <span class="fw-bold fst-italic">соглашениями о вызовах</span> (calling conventions). Они определяют, как передавать аргументы и управлять стеком во время вызова метода, а также как возвращать значение. В этой книге, иллюстрируя ассемблерный код, мы предполагаем использование <span class="fw-bold fst-italic">соглашения о вызовах Microsoft x64</span>. Упрощенно для наших целей, набор правил выглядит следующим образом:</p>
+    <ul class="bullet-list ms-1">
+      <li>
+        <p class="justify-style">Первые четыре целочисленных аргумента и аргумента-указателя передаются через регистры <span class="fw-bold fst-italic">RCX, RDX, R8</span> и <span class="fw-bold fst-italic">R9</span>.</p>
+      </li>
+      <li>
+        <p class="justify-style">Первые четыре аргумента с плавающей точкой передаются через регистры <span class="fw-bold fst-italic">Xmm0–Xmm3</span>.</p>
+      </li>
+      <li>
+        <p class="justify-style">Дополнительные аргументы помещаются в стек.</p>
+      </li>
+      <li>
+        <p class="justify-style">Целочисленные возвращаемые значения возвращаются через регистр <span class="fw-bold fst-italic">RAX</span>, если их размер не превышает 64 бит.</p>
+      </li>
+    </ul>
+    <p class="card-text justify-style">Обратите внимание, что соглашения о вызовах для <span class="fw-bold fst-italic">Linux x64</span> отличаются и не будут рассматриваться в этой книге.</p>
+  </div>
+</div>
+
+<p class="justify-style">Мы надеемся, что это очень краткое и слегка ошеломляющее путешествие показало вам, какие обязанности выполняет среда выполнения .NET. В конечном итоге все вызываемые методы JIT-компилируются в обычный ассемблерный код, при необходимости используя некоторые "управляемые" части среды выполнения.</p>
 
 <hr class="border-2">
 <p id="chapter4-3" class="h3 p-2">Сборки и домены приложений</p>
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
