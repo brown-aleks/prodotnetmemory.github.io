@@ -705,14 +705,79 @@ ret
 
 <hr class="border-2">
 <p id="chapter4-4-2" class="h4 p-2">Сценарий 4-2 — Использование собственной памяти моей программой продолжает расти</p>
-<p class="justify-style">Текст ...</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: Ваш клиент сообщает об исключении <span class="fw-bold fst-italic">OutOfMemory</span> после нескольких дней непрерывной работы с вашей службой Windows, написанной на .NET. Вам необходимо выяснить причину и, конечно, сделать это быстро.</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style"><span class="fw-bold fst-italic">Ответ</span>: Учитывая, что вам не предоставлен полный дамп памяти процесса, вы можете начать расследование с мониторинга использования памяти программой с течением времени. Вы можете начать с инструмента <span class="fw-bold fst-italic">Performance Monitor</span>, чтобы отслеживать наиболее важные счетчики (см. <a href="#f-4-8">Рисунок 4-8</a>):</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Working Set - Private</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Private Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Virtual Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Memory(имя_процесса)# Total committed Bytes</span>: Счетчик для наблюдения за использованием Managed Heap.</p>
+  </li>
+</ul>
+
+<figure id="f-4-8" class="figure">
+  <img src="content/img/4-8.png" class="img-fluid" alt="Рисунок 4-8" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-8. Счетчики производительности для Сценария 4-2 показывают стабильный размер управляемой кучи, но приватный рабочий набор постоянно растет.</figcaption>
+</figure>
+
+<p class="justify-style">Из того, что вы видите, очевидно, что существует утечка памяти — использование памяти процессом постоянно растет. Однако размер управляемой кучи (Managed Heap) очень стабилен, поэтому, вероятно, это утечка неуправляемой памяти, не связанная с вашим кодом на .NET (хотя, как вы увидите в Сценарии 4-3, это может быть и не так!). Зная это, стоит заглянуть внутрь процесса с помощью <span class="fw-bold fst-italic">VMMap</span>. Как вы можете заметить при кратком наблюдении, размер памяти типа <span class="fw-bold fst-italic">Heap</span> (Private) постоянно растет. Ваша программа медленно создает все больше и больше областей памяти <span class="fw-bold fst-italic">Heap</span> размером около 16 MiB (см. <a href="#f-4-9">Рисунок 4-9</a>).</p>
+
+<figure id="f-4-9" class="figure">
+  <img src="content/img/4-9.png" class="img-fluid" alt="Рисунок 4-9" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-9. Представление <span class="fw-bold fst-italic">VMMap</span> для областей памяти типа <span class="fw-bold fst-italic">Heap</span> в Сценарии 4-2. Постоянно растущие и периодически создаваемые области памяти <span class="fw-bold fst-italic">Heap (Private Data)</span>.</figcaption>
+</figure>
+
+<p class="justify-style">Это первый ключ в этом расследовании — области <span class="fw-bold fst-italic">Heap</span>, скорее всего, растут из-за активного использования <span class="fw-bold fst-italic">API Heap</span> (например, вызовов <span class="fw-bold fst-italic">malloc</span> в C или оператора <span class="fw-bold fst-italic">new</span> в C++). Теперь вам нужно выяснить, какой код вызывает это. Сделать это с помощью дампа памяти процесса может быть утомительно, поскольку анализ неуправляемой памяти очень сложен (особенно для людей, работающих с .NET и не привыкших к неуправляемому миру).</p>
+
+<p class="justify-style">К счастью, есть гораздо более простой способ исследовать это с помощью <span class="fw-bold fst-italic">PerfView</span>. В его диалоговом окне <span class="fw-bold fst-italic">Collect</span> введите имя исполняемого файла в поле <span class="fw-bold fst-italic">OS Heap Exe</span> или идентификатор процесса в поле <span class="fw-bold fst-italic">OS Heap Process</span> (помните, что только во втором случае вы можете подключиться к уже запущенному процессу). Указание одного из параметров <span class="fw-bold fst-italic">OS Heap</span> включает отслеживание использования <span class="fw-bold fst-italic">API Heap</span> с помощью ETW. Запустите сбор данных и подождите соответствующее количество времени в зависимости от того, как быстро растет использование памяти вашим процессом.</p>
+
+<p class="justify-style">После остановки сбора и завершения всей обработки вы должны открыть <span class="fw-bold fst-italic">Net OS Heap Alloc Stacks</span> из папки <span class="fw-bold fst-italic">Memory Group</span>. Постепенно раскрывайте отдельные элементы дерева, углубляясь в наиболее активно выделяющую память часть кода (с наибольшим значением в столбце <span class="fw-bold fst-italic">Inc %</span>). Для некоторых узлов может потребоваться загрузка символов (щелкните правой кнопкой мыши и выберите <span class="fw-bold fst-italic">Lookup Symbols</span> из контекстного меню). Также стоит отключить группировку модулей, используя опцию <span class="fw-bold fst-italic">Ungroup Module</span> из того же контекстного меню. Вскоре вы сможете четко увидеть причину более 90% выделений памяти (см. <a href="#f-4-10">Рисунок 4-10</a>). Это сила ETW у вас под рукой!</p>
+
+<figure id="f-4-10" class="figure">
+  <img src="content/img/4-10.png" class="img-fluid" alt="Рисунок 4-10" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-10. Анализ PerfView для сценария 4-2. Вы видите агрегированный стек вызовов для оператора new</figcaption>
+</figure>
+
+<p class="justify-style">Вы видите, что причина большинства выделений памяти — это использование оператора `new` внутри метода <span class="fw-bold fst-italic">CUnmanagedLibrary::CalculateSomething</span>, который вызывается другими компонентами .NET-приложения. Это действительно коренная причина проблемы, так как упомянутый метод имеет специально подготовленную, довольно глупую реализацию (см. <a href="#l-4-4">Листинг 4-4</a>).</p>
+
+<br>
+<figure id="l-4-4" class="figure">
+  <pre class="code border border-secondary px-5">
+    <code class="language-cpp">
+int CUnmanagedLibrary::CalculateSomething(int size)
+{
+  int* buffer = new int[size];
+  return 2 * size;
+}
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-4. Причина утечки памяти в сценарии 4-2</figcaption>
+</figure>
+
+<p class="justify-style">В реальных сценариях может быть множество других источников выделения памяти, поэтому вам придется исследовать их и сделать обоснованное предположение, что может быть настоящим вызовом. Также обратите внимание, что если у вас нет файлов символов для неуправляемых библиотек, используемых вашим приложением, вы не увидите конкретных имен методов и функций в представлении <span class="fw-bold fst-italic">Net Virtual Alloc Stacks</span>. Однако оно все равно укажет на компонент, вызывающий проблемы, поэтому вы можете связаться с его производителем или поискать решение в Интернете. Также стоит помнить, что трассировка ETW для API <span class="fw-bold fst-italic">Heap</span> может вносить значительные накладные расходы, поэтому будьте осторожны при ее включении, особенно в производственных средах.</p>
 
 <hr class="border-2">
 <p id="chapter4-4-3" class="h4 p-2">Сценарий 4-3 — Использование виртуальной памяти моей программой продолжает расти</p>
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
