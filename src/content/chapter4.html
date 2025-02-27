@@ -768,20 +768,74 @@ int CUnmanagedLibrary::CalculateSomething(int size)
 
 <hr class="border-2">
 <p id="chapter4-4-3" class="h4 p-2">Сценарий 4-3 — Использование виртуальной памяти моей программой продолжает расти</p>
-<p class="justify-style">Текст ...</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: На машинах клиента происходит что-то странное с вашим приложением. Использование памяти, кажется, растет бесконечно, хотя это не оказывает никакого негативного влияния, и программа работает правильно. Клиент сообщает, что потребляются «гигабайты памяти», хотя вы никогда не наблюдали такого поведения в своих средах. Никто не знает, стоит ли вам беспокоиться или нет.</p>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style"><span class="fw-bold fst-italic">Анализ</span>: Вам следует снова начать расследование с мониторинга использования памяти программой с течением времени. Вы можете начать с инструмента <span class="fw-bold fst-italic">Performance Monitor</span>, чтобы отслеживать следующие счетчики производительности:</p>
 
-<p class="justify-style">Текст ...</p>
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Working Set - Private</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Private Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Virtual Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Memory(имя_процесса)# Total committed Bytes</span></p>
+  </li>
+</ul>
 
-<p class="justify-style">Текст ...</p>
+<p class="justify-style">Вскоре вы можете заметить, что использование управляемой кучи и размер приватного рабочего набора стабильны. Однако наблюдается постоянный рост приватных байтов — вероятно, большая часть выделенной памяти не находится в физической оперативной памяти. Виртуальные байты также постоянно растут, указывая на гигабайты виртуальной памяти, «потребляемой» в адресном пространстве процесса! При анализе процесса с помощью <span class="fw-bold fst-italic">VMMap</span> вы увидите причину этого (см. <a href="#f-4-11">Рисунок 4-11</a>). Действительно, потребляется более 40 ГБ виртуальной памяти. Однако около 37 ГБ помечены как непригодные для использования! Это указывает на то, что кто-то выделяет страницы очень неэффективно (вспомните Главу 2). Вы можете проверить это предположение, взглянув на список областей памяти (см. <a href="#f-4-12">Рисунок 4-12</a>), где есть множество страниц с непригодными данными.</p>
 
-<p class="justify-style">Текст ...</p>
+<figure id="f-4-11" class="figure">
+    <img src="content/img/4-11.png" class="img-fluid" alt="Рисунок 4-11" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-11. Вид VMMap процесса для сценария 4-3. Существует огромное количество виртуальной памяти (Size), но большая ее часть неиспользуемая.</figcaption>
+</figure>
+
+<figure id="f-4-12" class="figure">
+    <img src="content/img/4-12.png" class="img-fluid" alt="Рисунок 4-12" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-12. Вид VMMap Неиспользуемых регионов для Сценария 4-3. Существует много, много таких регионов, перемежающихся с частными данными размером в одну страницу.</figcaption>
+</figure>
+
+<p class="justify-style">Теперь вам нужно понять, какая часть вашей программы использует страницы таким неправильным образом. Снова вы можете использовать PerfView, но на этот раз вас интересует API Virtual (например, вызовы VirtualAlloc), так как тип памяти Private Data был идентифицирован (а не тип Heap). Вам следует установить флажок VirtAlloc в диалоговом окне Collect и начать сбор данных, пока ваше проблемное приложение работает. Включение этого провайдера вносит меньшие накладные расходы, чем API Heap, использованный в Сценарии 4-2.</p>
+
+<p class="justify-style">После остановки сбора и завершения всей обработки вы должны открыть Net Virtual Alloc Stacks из папки Memory Group. Если утечка памяти значительна, вы, вероятно, найдете коренную причину в верхней части представленного списка — в этом примере 70,4% всех выделений памяти были вызваны вызовами VirtualAlloc (см. <a href="#f-4-13">Рисунок 4-13</a>).</p>
+
+<figure id="f-4-13" class="figure">
+    <img src="content/img/4-13.png" class="img-fluid" alt="Рисунок 4-13" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-13. Анализ PerfView для сценария 4-3 показывает очень большое количество вызовов VirtualAlloc</figcaption>
+</figure>
+
+<p class="justify-style">Если вы дважды щелкните по нему, будет представлено дерево вызовов. Раскройте узлы с наибольшим вкладом в выделение памяти. При необходимости используйте загрузку символов и отключите группировку с помощью опций Lookup Symbols и Ungroup Module из контекстного меню. Теперь вы сможете найти самый большой источник виртуальных выделений: метод <span class="fw-bold fst-italic">MemoryLeaks.Leaks.UnusableLeak.Run()</span> из модуля MemoryLeaks в этом примере (см. <a href="#f-4-14">Рисунок 4-14</a>).</p>
+
+<figure id="f-4-14" class="figure">
+    <img src="content/img/4-14.png" class="img-fluid" alt="Рисунок 4-14" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-14. Анализ PerfView для сценария 4-3 показывает агрегированный стек вызовов для VirtualAlloc</figcaption>
+</figure>
+
+<p class="justify-style">И действительно, этот метод содержит вызов <span class="fw-bold fst-italic">VirtualAlloc</span> через interop, который выделяет только одну страницу (обычно 4 KiB), хотя, как вы знаете, гранулярность выделения на Windows составляет 64 KiB (см. <a href="#l-4-5">Листинг 4-5</a>). Таким образом, непригодные 60 KiB памяти тратятся впустую для каждого вызова <span class="fw-bold fst-italic">VirtualAlloc</span>.</p>
+
+<figure id="l-4-5" class="figure">
+  <pre class="code border border-secondary px-5">
+    <code class="language-csharp">
+ulong block = (ulong)DllImports.VirtualAlloc(IntPtr.Zero, new IntPtr(pageSize),
+    DllImports.AllocationType.Commit,
+    DllImports.MemoryProtection.ReadWrite);
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-5. Фрагмент проблемного кода для сценария 4-3</figcaption>
+</figure>
+
+<p class="justify-style">В реальном сценарии какая-либо используемая неуправляемая библиотека может использовать <span class="fw-bold fst-italic">VirtualAlloc</span> таким неэффективным способом. Используя данные ETW для API Virtual, вы сможете отследить до конкретного вызова метода, ответственного за неэффективные виртуальные выделения памяти.</p>
 
 <hr class="border-2">
 <p id="chapter4-4-4" class="h4 p-2">Сценарий 4-4 — Использование управляемой памяти моей программой продолжает расти с ростом количества сборок</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
