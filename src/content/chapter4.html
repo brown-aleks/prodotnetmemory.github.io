@@ -834,6 +834,105 @@ ulong block = (ulong)DllImports.VirtualAlloc(IntPtr.Zero, new IntPtr(pageSize),
 <hr class="border-2">
 <p id="chapter4-4-4" class="h4 p-2">Сценарий 4-4 — Использование управляемой памяти моей программой продолжает расти с ростом количества сборок</p>
 
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: Ваш клиент жалуется на большое использование памяти вашим приложением. Оно постоянно растет до гигабайтов, а затем завершается сбоем из-за исключения OutOfMemory. Вы уверены, что код не использует никаких неуправляемых компонентов, поэтому убеждены, что утечка памяти происходит в коде на C# (хотя всегда помните, что библиотеки, которые вы используете, могут внутренне использовать неуправляемый код, так что... всегда будьте осторожны и помните о ранее представленных сценариях). Клиент прислал вам несколько скриншотов Диспетчера задач, показывающих, что все размеры памяти действительно постоянно растут.</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Анализ</span>: Вы начинаете анализ с типичного мониторинга следующих счетчиков производительности:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Working Set - Private</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Private Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Virtual Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Memory(имя_процесса)# Total committed Bytes</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Вы очень удивлены, потому что оказывается, что общее количество выделенных байтов управляемой кучи стабильно. Но действительно, все остальные наблюдаемые размеры растут, даже приватный рабочий набор. Инстинктивно вы заглядываете внутрь процесса с помощью VMMap. Вы видите через несколько минут наблюдения, что приватный рабочий набор управляемой кучи постоянно растет, поэтому, очевидно, ваша утечка памяти как-то связана с .NET. Но почему это не отражается на счетчике производительности? Взглянув на список типов Managed Heap в VMMap, вы замечаете что-то необычное (см. <a href="#f-4-15">Рисунок 4-15</a>). Область Managed Heap, помеченная как GC (часть, которая хранит объекты, выделенные вашим приложением), растет очень медленно. С другой стороны, есть десятки областей Domain 1, Domain 1 Low Frequency Heap и Domain 1 High Frequency Heap! Это означает, что загружается множество дополнительных сборок, скорее всего, из-за динамического создания сборок.</p>
+
+<figure id="f-4-15" class="figure">
+  <img src="content/img/4-15.png" class="img-fluid" alt="Рисунок 4-15" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-15. Вид VMMap управляемых куч для сценария 4-4</figcaption>
+</figure>
+
+<p class="justify-style">Вы подтверждаете эту ситуацию, возвращаясь к Performance Monitor и добавляя следующие дополнительные счетчики:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Bytes in Loader Heap</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Current Classes Loaded</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Current Assemblies</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Current appdomains</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Первые три счетчика постоянно растут, поэтому, очевидно, вы только что нашли коренную причину утечки памяти. Некоторый код загружает десятки динамических сборок.</p>
+
+<p class="justify-style">Вы могли бы использовать dotnet-counters, чтобы увидеть, как счетчики Number of Assemblies Loaded и Number of Methods Jitted растут как сумасшедшие, как показано на <a href="#f-4-16">рисунке 4-16</a>.</p>
+
+<figure id="f-4-16" class="figure">
+  <img src="content/img/4-16.png" class="img-fluid" alt="Рисунок 4-16" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-16. Счетчики dotnet, отображающие огромное количество загруженных сборок и JIT-методов</figcaption>
+</figure>
+
+<p class="justify-style">Наличие более 75 000 загруженных сборок с более чем 500 000 JIT-скомпилированных методов определенно не является признаком нормальной ситуации!</p>
+
+<p class="justify-style">Снова на помощь приходят ETW и PerfView! На этот раз вас интересуют события, связанные с загрузкой сборок. Вы можете включить их отслеживание, используя поле Additional Providers в диалоговом окне Collect. Введите туда <span class="fw-bold fst-italic">Microsoft-Windows-DotNETRuntime:LoaderKeyword:Always:@StacksEnabled=true</span>, что означает, что вы заинтересованы в событиях, связанных с загрузкой, и хотите записывать стеки вызовов для каждого события. Запустите сбор данных и подождите соответствующее количество времени (например, в течение которого загрузка нескольких новых сборок будет видна благодаря счетчику Current Assemblies).</p>
+
+<p class="justify-style">После остановки сбора и завершения всей обработки вы должны открыть список событий и найти события Microsoft-Windows-DotNETRuntime/Loader/AssemblyLoad для вашего процесса (см. <a href="#f-4-17">Рисунок 4-17</a>).</p>
+
+<figure id="f-4-17" class="figure">
+  <img src="content/img/4-17.png" class="img-fluid" alt="Рисунок 4-17" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-17. Вид событий PerfView для сценария 4-4. Вы видите много событий AssemblyLoad</figcaption>
+</figure>
+
+<p class="justify-style">Выберите одно из них и выберите опцию контекстного меню Open Any Stacks для столбца Time MSec (стек не будет отображаться, если щелкнуть правой кнопкой мыши на ячейке в любом другом столбце). Будет отображен стек вызовов этого события. Сгруппировав модули, которые вас не интересуют (например, модули среды выполнения .NET, такие как clr, mscoree или mscoreei), и разгруппировав свои собственные модули, вы четко определите источник создания динамических сборок (см. <a href="#f-4-18">Рисунок 4-18</a>). Это конструктор XmlSerializer, вызываемый в вашем методе XmlSerializerLeak.Run().</p>
+
+<figure id="f-4-18" class="figure">
+  <img src="content/img/4-18.png" class="img-fluid" alt="Рисунок 4-18" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-18. Представление трассировки стека PerfView для одного события AssemblyLoad указывает на конструктор XmlSerializer</figcaption>
+</figure>
+
+<p class="justify-style">Вы только что нашли проблему! Действительно, документация Microsoft для XmlSerializer гласит:</p>
+
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-body">
+    <p class="card-text justify-style">Чтобы повысить производительность, инфраструктура XML-сериализации динамически генерирует сборки для сериализации и десериализации указанных типов. Инфраструктура находит и повторно использует эти сборки. Это поведение происходит только при использовании следующих конструкторов:</p>
+
+    <ul class="bullet-list ms-1">
+      <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">XmlSerializer.XmlSerializer(Type)</span></p>
+      </li>
+      <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">XmlSerializer.XmlSerializer(Type, String)</span></p>
+      </li>
+    </ul>
+
+    <p class="card-text justify-style">Если вы используете любой из других конструкторов, генерируются несколько версий одной и той же сборки, которые никогда не выгружаются, что приводит к утечке памяти и снижению производительности. Самое простое решение — использовать один из двух упомянутых выше конструкторов. В противном случае вы должны кэшировать сборки в Hashtable, как показано в следующем примере.</p>
+  </div>
+</div>
+
+<p class="justify-style">В этом примере, как показано на Рисунке 4-18, используется один из других неудачных конструкторов: сгенерированные сборки не переиспользуются, что приводит к наблюдаемой утечке памяти.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Причина проблемы может быть аналогично устранена в других ситуациях, связанных с динамическим созданием сборок, таких как вызов <span class="fw-bold fst-italic">AppDomain.CreateDomain</span> без его выгрузки или использование различных механизмов выполнения скриптов, создающих сборки для скомпилированных скриптов.</p>
+  </div>
+</div>
+
 <p class="justify-style">Текст ...</p>
 
 <p class="justify-style">Текст ...</p>
