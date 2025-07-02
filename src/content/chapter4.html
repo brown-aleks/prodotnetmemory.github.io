@@ -659,22 +659,311 @@ ret
 
 <hr class="border-2">
 <p id="chapter4-4-1" class="h4 p-2">Сценарий 4-1 — Насколько велика моя программа в памяти?</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Проблема</span>: Клиенты, для которых вы разрабатываете приложение на .NET, спрашивают, сколько оперативной памяти оно требует и каково его типичное использование памяти, потому что они подозревают, что оно потребляет слишком много ресурсов. Это вызывает проблемы в команде, потому что оказывается, что никто не знает ответа и даже как правильно измерить эти показатели. Каждый предлагает разные инструменты с разными способами интерпретации результатов. Предположим, вы разработчики Paint.NET (<a href="https://www.getpaint.net/" target="_blank">www.getpaint.net/)</a>!</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Ответ</span>: Чтобы правильно ответить на вопрос ваших клиентов, вы должны понимать, как операционная система видит использование памяти вашим процессом. Это было кратко описано в Главе 2, и вы, вероятно, заметили, что между различными инструментами нет большой согласованности. С точки зрения высокого уровня, вам следует сосредоточиться на следующих измерениях:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Private working set (Приватный рабочий набор)</span>: Указывает объем физической оперативной памяти, занимаемой процессом. Это, очевидно, может быть основным узким местом для контейнеров, поэтому вам следует сначала обратить внимание на это.</p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Private bytes (Приватные байты, также известные как commit size)</span>: Указывает объем памяти как в физической оперативной памяти, так и в файле подкачки. Вам не нужно чрезмерное использование подкачки, поэтому, если этот размер значительно больше приватного рабочего набора, вам следует насторожиться. Неограниченный рост файла подкачки также опасен, так как ваши жесткие диски не имеют бесконечного объема памяти.</p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Virtual bytes (Виртуальные байты)</span>: Указывает все виртуальные байты, как выделенные (приватные), так и только зарезервированные, независимо от их местоположения. Это измерение является наиболее абстрактным, поскольку оно не приводит к значительному потреблению физических ресурсов, за исключением таблиц страниц (см. Главу 2). Только в 32-битном сценарии вам нужно убедиться, что вы не достигаете предела в 2 ГБ. В 64-битных системах .NET Core резервирует 2 ТБ, так что не пугайтесь, когда увидите это!</p>
+  </li>
+</ul>
+
+<p class="justify-style">В Windows для измерения этих размеров вы можете просто использовать вкладку <span class="fw-bold fst-italic">Details</span> в Диспетчере задач, где они отображаются как <span class="fw-bold fst-italic">Memory (private working set)</span> и <span class="fw-bold fst-italic">Commit size</span> соответственно (виртуальные байты там не отображаются) — см. <a href="#f-4-5">Рисунок 4-5</a>.</p>
+
+<figure id="f-4-5" class="figure">
+  <img src="content/img/4-5.png" class="img-fluid" alt="Рисунок 4-5" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-5. Диспетчер задач окна, показывающий основные данные об использовании памяти</figcaption>
+</figure>
+
+<p class="justify-style">Вы также можете использовать инструмент <span class="fw-bold fst-italic">Performance Monitor</span> (см. <a href="#f-4-6">Рисунок 4-6</a>) для записи счетчиков \Process(processname)\ Working Set - Private, \Process(processname)\Private Bytes и \Process(processname)\Virtual Bytes с течением времени. Помимо абсолютных размеров, тенденции, конечно же, также важны.</p>
+
+<figure id="f-4-6" class="figure">
+  <img src="content/img/4-6.png" class="img-fluid" alt="Рисунок 4-6" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-6. Счетчики производительности, показывающие основные данные об использовании памяти</figcaption>
+</figure>
+
+<p class="justify-style">Вы также можете рассмотреть возможность анализа того, что включено в измеряемый размер процесса, с помощью инструмента VMMap на Windows (см. <a href="#f-4-4">Рисунок 4-4</a>, где он уже был представлен). Там вы найдете те же столбцы измерений: Private WS, Private и Size. Что касается типов памяти, важно сначала посмотреть на Managed Heap. Однако также стоит обратить внимание на другие типы памяти. Если вы подозреваете утечку памяти, наблюдайте за размерами всех типов памяти с течением времени и попытайтесь обнаружить, что постоянно растет. Утечка памяти может быть как в вашем управляемом коде, так и в каком-либо используемом неуправляемом компоненте (даже неявно, когда вы об этом не знаете).</p>
+
+<p class="justify-style">На Linux вы можете использовать инструмент top и соответствующие столбцы, описанные в Главе 2. Также можно использовать CLI-инструмент dotnet-counters, представленный в Главе 3, с командой monitor -p &lt;идентификатор процесса&gt;. Вы получите как размер управляемой памяти (путем суммирования счетчиков Gen1 Size (B), Gen2 Size (B), LOH Size (B) и POH (Pinned Object Heap) Size (B)), так и размер рабочего набора (с помощью счетчика Working Set (MB)), как показано на <a href="#f-4-7">Рисунке 4-7</a>.</p>
+
+<figure id="f-4-7" class="figure">
+  <img src="content/img/4-7.png" class="img-fluid" alt="Рисунок 4-7" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-7. Использование dotnet-counters для просмотра рабочего набора и использования управляемой памяти</figcaption>
+</figure>
+
+<p class="justify-style">Вы могли заметить счетчик <span class="fw-bold fst-italic">GC Committed Bytes (MB)</span>: он показывает совокупные выделенные байты во всех управляемых кучах (SOH, LOH, POH), включая NGCH, подробно описанный в Главе 5, а также свободные списки и непригодную для использования фрагментированную память, описанные в Главе 6.</p>
+
+<p class="justify-style">Когда вы используете <span class="fw-bold fst-italic">Server GC</span>, помните, что использование памяти может варьироваться в зависимости от оборудования (количества ядер или доступной памяти).</p>
 
 <hr class="border-2">
 <p id="chapter4-4-2" class="h4 p-2">Сценарий 4-2 — Использование собственной памяти моей программой продолжает расти</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: Ваш клиент сообщает об исключении <span class="fw-bold fst-italic">OutOfMemory</span> после нескольких дней непрерывной работы с вашей службой Windows, написанной на .NET. Вам необходимо выяснить причину и, конечно, сделать это быстро.</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Ответ</span>: Учитывая, что вам не предоставлен полный дамп памяти процесса, вы можете начать расследование с мониторинга использования памяти программой с течением времени. Вы можете начать с инструмента <span class="fw-bold fst-italic">Performance Monitor</span>, чтобы отслеживать наиболее важные счетчики (см. <a href="#f-4-8">Рисунок 4-8</a>):</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Working Set - Private</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Private Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Virtual Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Memory(имя_процесса)# Total committed Bytes</span>: Счетчик для наблюдения за использованием Managed Heap.</p>
+  </li>
+</ul>
+
+<figure id="f-4-8" class="figure">
+  <img src="content/img/4-8.png" class="img-fluid" alt="Рисунок 4-8" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-8. Счетчики производительности для Сценария 4-2 показывают стабильный размер управляемой кучи, но приватный рабочий набор постоянно растет.</figcaption>
+</figure>
+
+<p class="justify-style">Из того, что вы видите, очевидно, что существует утечка памяти — использование памяти процессом постоянно растет. Однако размер управляемой кучи (Managed Heap) очень стабилен, поэтому, вероятно, это утечка неуправляемой памяти, не связанная с вашим кодом на .NET (хотя, как вы увидите в Сценарии 4-3, это может быть и не так!). Зная это, стоит заглянуть внутрь процесса с помощью <span class="fw-bold fst-italic">VMMap</span>. Как вы можете заметить при кратком наблюдении, размер памяти типа <span class="fw-bold fst-italic">Heap</span> (Private) постоянно растет. Ваша программа медленно создает все больше и больше областей памяти <span class="fw-bold fst-italic">Heap</span> размером около 16 MiB (см. <a href="#f-4-9">Рисунок 4-9</a>).</p>
+
+<figure id="f-4-9" class="figure">
+  <img src="content/img/4-9.png" class="img-fluid" alt="Рисунок 4-9" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-9. Представление <span class="fw-bold fst-italic">VMMap</span> для областей памяти типа <span class="fw-bold fst-italic">Heap</span> в Сценарии 4-2. Постоянно растущие и периодически создаваемые области памяти <span class="fw-bold fst-italic">Heap (Private Data)</span>.</figcaption>
+</figure>
+
+<p class="justify-style">Это первый ключ в этом расследовании — области <span class="fw-bold fst-italic">Heap</span>, скорее всего, растут из-за активного использования <span class="fw-bold fst-italic">API Heap</span> (например, вызовов <span class="fw-bold fst-italic">malloc</span> в C или оператора <span class="fw-bold fst-italic">new</span> в C++). Теперь вам нужно выяснить, какой код вызывает это. Сделать это с помощью дампа памяти процесса может быть утомительно, поскольку анализ неуправляемой памяти очень сложен (особенно для людей, работающих с .NET и не привыкших к неуправляемому миру).</p>
+
+<p class="justify-style">К счастью, есть гораздо более простой способ исследовать это с помощью <span class="fw-bold fst-italic">PerfView</span>. В его диалоговом окне <span class="fw-bold fst-italic">Collect</span> введите имя исполняемого файла в поле <span class="fw-bold fst-italic">OS Heap Exe</span> или идентификатор процесса в поле <span class="fw-bold fst-italic">OS Heap Process</span> (помните, что только во втором случае вы можете подключиться к уже запущенному процессу). Указание одного из параметров <span class="fw-bold fst-italic">OS Heap</span> включает отслеживание использования <span class="fw-bold fst-italic">API Heap</span> с помощью ETW. Запустите сбор данных и подождите соответствующее количество времени в зависимости от того, как быстро растет использование памяти вашим процессом.</p>
+
+<p class="justify-style">После остановки сбора и завершения всей обработки вы должны открыть <span class="fw-bold fst-italic">Net OS Heap Alloc Stacks</span> из папки <span class="fw-bold fst-italic">Memory Group</span>. Постепенно раскрывайте отдельные элементы дерева, углубляясь в наиболее активно выделяющую память часть кода (с наибольшим значением в столбце <span class="fw-bold fst-italic">Inc %</span>). Для некоторых узлов может потребоваться загрузка символов (щелкните правой кнопкой мыши и выберите <span class="fw-bold fst-italic">Lookup Symbols</span> из контекстного меню). Также стоит отключить группировку модулей, используя опцию <span class="fw-bold fst-italic">Ungroup Module</span> из того же контекстного меню. Вскоре вы сможете четко увидеть причину более 90% выделений памяти (см. <a href="#f-4-10">Рисунок 4-10</a>). Это сила ETW у вас под рукой!</p>
+
+<figure id="f-4-10" class="figure">
+  <img src="content/img/4-10.png" class="img-fluid" alt="Рисунок 4-10" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-10. Анализ PerfView для сценария 4-2. Вы видите агрегированный стек вызовов для оператора new</figcaption>
+</figure>
+
+<p class="justify-style">Вы видите, что причина большинства выделений памяти — это использование оператора `new` внутри метода <span class="fw-bold fst-italic">CUnmanagedLibrary::CalculateSomething</span>, который вызывается другими компонентами .NET-приложения. Это действительно коренная причина проблемы, так как упомянутый метод имеет специально подготовленную, довольно глупую реализацию (см. <a href="#l-4-4">Листинг 4-4</a>).</p>
+
+<br>
+<figure id="l-4-4" class="figure">
+  <pre class="code border border-secondary px-5">
+    <code class="language-cpp">
+int CUnmanagedLibrary::CalculateSomething(int size)
+{
+  int* buffer = new int[size];
+  return 2 * size;
+}
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-4. Причина утечки памяти в сценарии 4-2</figcaption>
+</figure>
+
+<p class="justify-style">В реальных сценариях может быть множество других источников выделения памяти, поэтому вам придется исследовать их и сделать обоснованное предположение, что может быть настоящим вызовом. Также обратите внимание, что если у вас нет файлов символов для неуправляемых библиотек, используемых вашим приложением, вы не увидите конкретных имен методов и функций в представлении <span class="fw-bold fst-italic">Net Virtual Alloc Stacks</span>. Однако оно все равно укажет на компонент, вызывающий проблемы, поэтому вы можете связаться с его производителем или поискать решение в Интернете. Также стоит помнить, что трассировка ETW для API <span class="fw-bold fst-italic">Heap</span> может вносить значительные накладные расходы, поэтому будьте осторожны при ее включении, особенно в производственных средах.</p>
 
 <hr class="border-2">
 <p id="chapter4-4-3" class="h4 p-2">Сценарий 4-3 — Использование виртуальной памяти моей программой продолжает расти</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: На машинах клиента происходит что-то странное с вашим приложением. Использование памяти, кажется, растет бесконечно, хотя это не оказывает никакого негативного влияния, и программа работает правильно. Клиент сообщает, что потребляются «гигабайты памяти», хотя вы никогда не наблюдали такого поведения в своих средах. Никто не знает, стоит ли вам беспокоиться или нет.</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Анализ</span>: Вам следует снова начать расследование с мониторинга использования памяти программой с течением времени. Вы можете начать с инструмента <span class="fw-bold fst-italic">Performance Monitor</span>, чтобы отслеживать следующие счетчики производительности:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Working Set - Private</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Private Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Virtual Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Memory(имя_процесса)# Total committed Bytes</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Вскоре вы можете заметить, что использование управляемой кучи и размер приватного рабочего набора стабильны. Однако наблюдается постоянный рост приватных байтов — вероятно, большая часть выделенной памяти не находится в физической оперативной памяти. Виртуальные байты также постоянно растут, указывая на гигабайты виртуальной памяти, «потребляемой» в адресном пространстве процесса! При анализе процесса с помощью <span class="fw-bold fst-italic">VMMap</span> вы увидите причину этого (см. <a href="#f-4-11">Рисунок 4-11</a>). Действительно, потребляется более 40 ГБ виртуальной памяти. Однако около 37 ГБ помечены как непригодные для использования! Это указывает на то, что кто-то выделяет страницы очень неэффективно (вспомните Главу 2). Вы можете проверить это предположение, взглянув на список областей памяти (см. <a href="#f-4-12">Рисунок 4-12</a>), где есть множество страниц с непригодными данными.</p>
+
+<figure id="f-4-11" class="figure">
+    <img src="content/img/4-11.png" class="img-fluid" alt="Рисунок 4-11" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-11. Вид VMMap процесса для сценария 4-3. Существует огромное количество виртуальной памяти (Size), но большая ее часть неиспользуемая.</figcaption>
+</figure>
+
+<figure id="f-4-12" class="figure">
+    <img src="content/img/4-12.png" class="img-fluid" alt="Рисунок 4-12" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-12. Вид VMMap Неиспользуемых регионов для Сценария 4-3. Существует много, много таких регионов, перемежающихся с частными данными размером в одну страницу.</figcaption>
+</figure>
+
+<p class="justify-style">Теперь вам нужно понять, какая часть вашей программы использует страницы таким неправильным образом. Снова вы можете использовать PerfView, но на этот раз вас интересует API Virtual (например, вызовы VirtualAlloc), так как тип памяти Private Data был идентифицирован (а не тип Heap). Вам следует установить флажок VirtAlloc в диалоговом окне Collect и начать сбор данных, пока ваше проблемное приложение работает. Включение этого провайдера вносит меньшие накладные расходы, чем API Heap, использованный в Сценарии 4-2.</p>
+
+<p class="justify-style">После остановки сбора и завершения всей обработки вы должны открыть Net Virtual Alloc Stacks из папки Memory Group. Если утечка памяти значительна, вы, вероятно, найдете коренную причину в верхней части представленного списка — в этом примере 70,4% всех выделений памяти были вызваны вызовами VirtualAlloc (см. <a href="#f-4-13">Рисунок 4-13</a>).</p>
+
+<figure id="f-4-13" class="figure">
+    <img src="content/img/4-13.png" class="img-fluid" alt="Рисунок 4-13" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-13. Анализ PerfView для сценария 4-3 показывает очень большое количество вызовов VirtualAlloc</figcaption>
+</figure>
+
+<p class="justify-style">Если вы дважды щелкните по нему, будет представлено дерево вызовов. Раскройте узлы с наибольшим вкладом в выделение памяти. При необходимости используйте загрузку символов и отключите группировку с помощью опций Lookup Symbols и Ungroup Module из контекстного меню. Теперь вы сможете найти самый большой источник виртуальных выделений: метод <span class="fw-bold fst-italic">MemoryLeaks.Leaks.UnusableLeak.Run()</span> из модуля MemoryLeaks в этом примере (см. <a href="#f-4-14">Рисунок 4-14</a>).</p>
+
+<figure id="f-4-14" class="figure">
+    <img src="content/img/4-14.png" class="img-fluid" alt="Рисунок 4-14" max-width="600">
+    <figcaption class="figure-caption">Рисунок 4-14. Анализ PerfView для сценария 4-3 показывает агрегированный стек вызовов для VirtualAlloc</figcaption>
+</figure>
+
+<p class="justify-style">И действительно, этот метод содержит вызов <span class="fw-bold fst-italic">VirtualAlloc</span> через interop, который выделяет только одну страницу (обычно 4 KiB), хотя, как вы знаете, гранулярность выделения на Windows составляет 64 KiB (см. <a href="#l-4-5">Листинг 4-5</a>). Таким образом, непригодные 60 KiB памяти тратятся впустую для каждого вызова <span class="fw-bold fst-italic">VirtualAlloc</span>.</p>
+
+<figure id="l-4-5" class="figure">
+  <pre class="code border border-secondary px-5">
+    <code class="language-csharp">
+ulong block = (ulong)DllImports.VirtualAlloc(IntPtr.Zero, new IntPtr(pageSize),
+    DllImports.AllocationType.Commit,
+    DllImports.MemoryProtection.ReadWrite);
+    </code>
+  </pre>
+  <figcaption class="figure-caption">Листинг 4-5. Фрагмент проблемного кода для сценария 4-3</figcaption>
+</figure>
+
+<p class="justify-style">В реальном сценарии какая-либо используемая неуправляемая библиотека может использовать <span class="fw-bold fst-italic">VirtualAlloc</span> таким неэффективным способом. Используя данные ETW для API Virtual, вы сможете отследить до конкретного вызова метода, ответственного за неэффективные виртуальные выделения памяти.</p>
 
 <hr class="border-2">
 <p id="chapter4-4-4" class="h4 p-2">Сценарий 4-4 — Использование управляемой памяти моей программой продолжает расти с ростом количества сборок</p>
-<p class="justify-style">Текст ...</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: Ваш клиент жалуется на большое использование памяти вашим приложением. Оно постоянно растет до гигабайтов, а затем завершается сбоем из-за исключения OutOfMemory. Вы уверены, что код не использует никаких неуправляемых компонентов, поэтому убеждены, что утечка памяти происходит в коде на C# (хотя всегда помните, что библиотеки, которые вы используете, могут внутренне использовать неуправляемый код, так что... всегда будьте осторожны и помните о ранее представленных сценариях). Клиент прислал вам несколько скриншотов Диспетчера задач, показывающих, что все размеры памяти действительно постоянно растут.</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Анализ</span>: Вы начинаете анализ с типичного мониторинга следующих счетчиков производительности:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Working Set - Private</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Private Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">\Process(имя_процесса)\Virtual Bytes</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Memory(имя_процесса)# Total committed Bytes</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Вы очень удивлены, потому что оказывается, что общее количество выделенных байтов управляемой кучи стабильно. Но действительно, все остальные наблюдаемые размеры растут, даже приватный рабочий набор. Инстинктивно вы заглядываете внутрь процесса с помощью VMMap. Вы видите через несколько минут наблюдения, что приватный рабочий набор управляемой кучи постоянно растет, поэтому, очевидно, ваша утечка памяти как-то связана с .NET. Но почему это не отражается на счетчике производительности? Взглянув на список типов Managed Heap в VMMap, вы замечаете что-то необычное (см. <a href="#f-4-15">Рисунок 4-15</a>). Область Managed Heap, помеченная как GC (часть, которая хранит объекты, выделенные вашим приложением), растет очень медленно. С другой стороны, есть десятки областей Domain 1, Domain 1 Low Frequency Heap и Domain 1 High Frequency Heap! Это означает, что загружается множество дополнительных сборок, скорее всего, из-за динамического создания сборок.</p>
+
+<figure id="f-4-15" class="figure">
+  <img src="content/img/4-15.png" class="img-fluid" alt="Рисунок 4-15" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-15. Вид VMMap управляемых куч для сценария 4-4</figcaption>
+</figure>
+
+<p class="justify-style">Вы подтверждаете эту ситуацию, возвращаясь к Performance Monitor и добавляя следующие дополнительные счетчики:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Bytes in Loader Heap</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Current Classes Loaded</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Current Assemblies</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">.NET CLR Loading(имя_процесса)\Current appdomains</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Первые три счетчика постоянно растут, поэтому, очевидно, вы только что нашли коренную причину утечки памяти. Некоторый код загружает десятки динамических сборок.</p>
+
+<p class="justify-style">Вы могли бы использовать dotnet-counters, чтобы увидеть, как счетчики Number of Assemblies Loaded и Number of Methods Jitted растут как сумасшедшие, как показано на <a href="#f-4-16">рисунке 4-16</a>.</p>
+
+<figure id="f-4-16" class="figure">
+  <img src="content/img/4-16.png" class="img-fluid" alt="Рисунок 4-16" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-16. Счетчики dotnet, отображающие огромное количество загруженных сборок и JIT-методов</figcaption>
+</figure>
+
+<p class="justify-style">Наличие более 75 000 загруженных сборок с более чем 500 000 JIT-скомпилированных методов определенно не является признаком нормальной ситуации!</p>
+
+<p class="justify-style">Снова на помощь приходят ETW и PerfView! На этот раз вас интересуют события, связанные с загрузкой сборок. Вы можете включить их отслеживание, используя поле Additional Providers в диалоговом окне Collect. Введите туда <span class="fw-bold fst-italic">Microsoft-Windows-DotNETRuntime:LoaderKeyword:Always:@StacksEnabled=true</span>, что означает, что вы заинтересованы в событиях, связанных с загрузкой, и хотите записывать стеки вызовов для каждого события. Запустите сбор данных и подождите соответствующее количество времени (например, в течение которого загрузка нескольких новых сборок будет видна благодаря счетчику Current Assemblies).</p>
+
+<p class="justify-style">После остановки сбора и завершения всей обработки вы должны открыть список событий и найти события Microsoft-Windows-DotNETRuntime/Loader/AssemblyLoad для вашего процесса (см. <a href="#f-4-17">Рисунок 4-17</a>).</p>
+
+<figure id="f-4-17" class="figure">
+  <img src="content/img/4-17.png" class="img-fluid" alt="Рисунок 4-17" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-17. Вид событий PerfView для сценария 4-4. Вы видите много событий AssemblyLoad</figcaption>
+</figure>
+
+<p class="justify-style">Выберите одно из них и выберите опцию контекстного меню Open Any Stacks для столбца Time MSec (стек не будет отображаться, если щелкнуть правой кнопкой мыши на ячейке в любом другом столбце). Будет отображен стек вызовов этого события. Сгруппировав модули, которые вас не интересуют (например, модули среды выполнения .NET, такие как clr, mscoree или mscoreei), и разгруппировав свои собственные модули, вы четко определите источник создания динамических сборок (см. <a href="#f-4-18">Рисунок 4-18</a>). Это конструктор XmlSerializer, вызываемый в вашем методе XmlSerializerLeak.Run().</p>
+
+<figure id="f-4-18" class="figure">
+  <img src="content/img/4-18.png" class="img-fluid" alt="Рисунок 4-18" max-width="600">
+  <figcaption class="figure-caption">Рисунок 4-18. Представление трассировки стека PerfView для одного события AssemblyLoad указывает на конструктор XmlSerializer</figcaption>
+</figure>
+
+<p class="justify-style">Вы только что нашли проблему! Действительно, документация Microsoft для XmlSerializer гласит:</p>
+
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-body">
+    <p class="card-text justify-style">Чтобы повысить производительность, инфраструктура XML-сериализации динамически генерирует сборки для сериализации и десериализации указанных типов. Инфраструктура находит и повторно использует эти сборки. Это поведение происходит только при использовании следующих конструкторов:</p>
+
+    <ul class="bullet-list ms-1">
+      <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">XmlSerializer.XmlSerializer(Type)</span></p>
+      </li>
+      <li>
+        <p class="justify-style"><span class="fw-bold fst-italic">XmlSerializer.XmlSerializer(Type, String)</span></p>
+      </li>
+    </ul>
+
+    <p class="card-text justify-style">Если вы используете любой из других конструкторов, генерируются несколько версий одной и той же сборки, которые никогда не выгружаются, что приводит к утечке памяти и снижению производительности. Самое простое решение — использовать один из двух упомянутых выше конструкторов. В противном случае вы должны кэшировать сборки в Hashtable, как показано в следующем примере.</p>
+  </div>
+</div>
+
+<p class="justify-style">В этом примере, как показано на <a href="#f-4-18">Рисунке 4-18</a>, используется один из других неудачных конструкторов: сгенерированные сборки не переиспользуются, что приводит к наблюдаемой утечке памяти.</p>
+
+<br>
+<div class="card text-bg-info mb-3 bg-opacity-10">
+  <div class="card-header"><i class="bi bi-info-square"></i> Примечание</div>
+  <div class="card-body">
+    <p class="card-text justify-style">Причина проблемы может быть аналогично устранена в других ситуациях, связанных с динамическим созданием сборок, таких как вызов <span class="fw-bold fst-italic">AppDomain.CreateDomain</span> без его выгрузки или использование различных механизмов выполнения скриптов, создающих сборки для скомпилированных скриптов.</p>
+  </div>
+</div>
 
 <hr class="border-2">
 <p id="chapter4-4-5" class="h4 p-2">Сценарий 4-5 — Моя программа не может выгрузить плагины</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: Вы написали программу, которая использует сборки с возможностью выгрузки (через AssemblyLoadContext) для загрузки и выгрузки плагинов. Но, очевидно, что-то не так. Использование памяти вашей программой, как видно из Диспетчера задач, медленно и бесконечно растет</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Анализ</span>: Вы начинаете предварительный анализ с помощью dotnet-counters и наблюдаете ключевые показатели:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Working Set (MB)</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">GC Committed Bytes (MB)</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">GC Heap Size (MB)</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Вы можете легко заметить, что Working Set быстро достигает значений порядка 1 ГБ, в то время как управляемая куча (Managed Heap) очень мала — порядка нескольких десятков мегабайт.</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
