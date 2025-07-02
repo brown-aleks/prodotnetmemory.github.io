@@ -923,7 +923,7 @@ ulong block = (ulong)DllImports.VirtualAlloc(IntPtr.Zero, new IntPtr(pageSize),
   </div>
 </div>
 
-<p class="justify-style">В этом примере, как показано на Рисунке 4-18, используется один из других неудачных конструкторов: сгенерированные сборки не переиспользуются, что приводит к наблюдаемой утечке памяти.</p>
+<p class="justify-style">В этом примере, как показано на <a href="#f-4-18">Рисунке 4-18</a>, используется один из других неудачных конструкторов: сгенерированные сборки не переиспользуются, что приводит к наблюдаемой утечке памяти.</p>
 
 <br>
 <div class="card text-bg-info mb-3 bg-opacity-10">
@@ -933,12 +933,37 @@ ulong block = (ulong)DllImports.VirtualAlloc(IntPtr.Zero, new IntPtr(pageSize),
   </div>
 </div>
 
-<p class="justify-style">Текст ...</p>
-
-<p class="justify-style">Текст ...</p>
-
 <hr class="border-2">
 <p id="chapter4-4-5" class="h4 p-2">Сценарий 4-5 — Моя программа не может выгрузить плагины</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Описание</span>: Вы написали программу, которая использует сборки с возможностью выгрузки (через AssemblyLoadContext) для загрузки и выгрузки плагинов. Но, очевидно, что-то не так. Использование памяти вашей программой, как видно из Диспетчера задач, медленно и бесконечно растет</p>
+
+<p class="justify-style"><span class="fw-bold fst-italic">Анализ</span>: Вы начинаете предварительный анализ с помощью dotnet-counters и наблюдаете ключевые показатели:</p>
+
+<ul class="bullet-list ms-1">
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">Working Set (MB)</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">GC Committed Bytes (MB)</span></p>
+  </li>
+  <li>
+    <p class="justify-style"><span class="fw-bold fst-italic">GC Heap Size (MB)</span></p>
+  </li>
+</ul>
+
+<p class="justify-style">Вы можете легко заметить, что Working Set быстро достигает значений порядка 1 ГБ, в то время как управляемая куча (Managed Heap) очень мала — порядка нескольких десятков мегабайт.</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
+<p class="justify-style">Текст ...</p>
+
 <p class="justify-style">Текст ...</p>
 
 <hr class="border-2">
