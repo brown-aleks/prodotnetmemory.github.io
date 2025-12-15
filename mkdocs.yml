@@ -1,0 +1,159 @@
+# Основная информация
+site_name: Pro .NET Управление Памятью
+site_description: Авторский перевод книги Pro .NET Memory Management на русский язык
+site_author: Александр Броун
+site_url: https://brown-aleks.github.io/prodotnetmemory.github.io/
+repo_url: https://github.com/brown-aleks/prodotnetmemory.github.io
+repo_name: brown-aleks/prodotnetmemory
+edit_uri: edit/main/docs/
+copyright: |
+  Copyright &copy; 2024 Konrad Kokosa, Christophe Nasarre, Kevin Gosse<br>
+  Перевод &copy; 2025 <a href="https://t.me/brown_aleks" target="_blank">Александр Броун</a>
+
+# Тема и её настройки
+theme:
+  name: material
+  language: ru
+  
+  # Цветовая схема
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Переключить на тёмную тему
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Переключить на светлую тему
+  
+  # Шрифты
+  font:
+    text: Roboto
+    code: Roboto Mono
+  
+  # Функции темы
+  features:
+    - announce.dismiss
+    - content.action.edit
+    - content.action.view
+    - content.code.annotate
+    - content.code.copy
+    - content.code.select
+    - content.tabs.link
+    - content.tooltips
+    - header.autohide
+    - navigation.expand
+    - navigation.footer
+    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.path
+    - navigation.prune
+    - navigation.sections
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+    - toc.integrate
+
+# Плагины (упрощённая версия без проблемных плагинов)
+plugins:
+  - search:
+      lang: ru
+
+# Расширения Markdown
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - meta
+  - tables
+  - toc:
+      permalink: true
+      permalink_title: Ссылка на этот раздел
+      toc_depth: 3
+  
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.critic
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      use_pygments: true
+      auto_title: true
+      linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+      combine_header_slug: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+# Дополнительные настройки
+extra:
+  # Социальные ссылки
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/brown-aleks
+      name: GitHub
+    - icon: fontawesome/brands/telegram
+      link: https://t.me/brown_aleks
+      name: Telegram
+
+# Дополнительные CSS стили
+extra_css:
+  - assets/stylesheets/custom.css
+
+# Навигация (упрощённая версия для начала)
+nav:
+  - Главная: index.md
+  - О книге:
+    - О проекте: about/index.md
+    - Об авторах: about/authors.md
+    - О техническом рецензенте: about/technical-reviewer.md
+    - Благодарности: about/acknowledgments.md
+    - Предисловие: about/foreword.md
+    - Введение: about/introduction.md
+  - Главы:
+    - Оглавление: chapters/index.md
+    - Глава 1: chapters/chapter-01/index.md
+    - Глава 2: chapters/chapter-02/index.md
+    - Глава 3: chapters/chapter-03/index.md
+    - Глава 4: chapters/chapter-04/index.md
+  - Приложения:
+    - Глоссарий: appendix/glossary.md
+    - Ресурсы: appendix/resources.md
+    - FAQ: appendix/faq.md

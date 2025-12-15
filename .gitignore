@@ -486,3 +486,30 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+
+# Python
+venv/
+env/
+*.pyc
+__pycache__/
+.python-version
+
+# MkDocs
+site/
+.cache/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Node (если остались зависимости)
+node_modules/
+npm-debug.log
+
+# Временные файлы конвертации
+*.html.bak
+*.md.tmp
