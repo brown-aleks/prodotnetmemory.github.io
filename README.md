@@ -70,7 +70,7 @@ booktranslations@springernature.com;
  ![donationalerts](/imgs/brown-aleks-donationalerts.png)
 
 ---
-- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io/chapters/)  
+- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io/src)  
 - [Об авторах](/about/about-the-authors.md)  
 - [О техническом рецензенте](/about/about-the-technical-reviewer.md)  
 - [Благодарности](/about/acknowledgments.md)  

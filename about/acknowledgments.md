@@ -36,7 +36,7 @@
 Наконец, спасибо вам, кем бы вы ни были, за то, что вы это читаете! Купили ли вы книгу, одолжили ее, получили в подарок или просто скачали с подозрительного сайта, сотни часов, которые мы посвятили этому, были бы бессмысленны без вас.  
 
 ---
-- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io/chapters/)  
+- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io/src)  
 - [Об авторах](../about/about-the-authors.md)  
 - [О техническом рецензенте](../about/about-the-technical-reviewer.md)  
 - [Предисловие](../about/foreword.md)  
