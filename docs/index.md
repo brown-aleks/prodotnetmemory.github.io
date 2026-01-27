@@ -1,4 +1,4 @@
----
+﻿---
 title: Главная
 hide:
   - navigation
@@ -55,13 +55,13 @@ hide:
 
 <div class="grid cards" markdown>
 
-- :fontawesome-solid-book-open: **[Начать чтение](chapters/chapter-01/)**  
+- :fontawesome-solid-book-open: **[Начать чтение](chapters/01-basic-concepts/)**  
   Перейти к первой главе
 
 - :material-format-list-bulleted: **[Оглавление](chapters/)**  
   Полное содержание книги
 
-- :fontawesome-solid-users: **[Об авторах](about/authors/)**  
+- :fontawesome-solid-users: **[Об авторах](about/authors.md)**  
   Информация об авторах оригинала
 
 - :material-github: **[GitHub](https://github.com/brown-aleks/prodotnetmemory.github.io)**  
