@@ -55,10 +55,10 @@ hide:
 
 <div class="grid cards" markdown>
 
-- :fontawesome-solid-book-open: **[Начать чтение](chapters/01-basic-concepts/)**  
+- :fontawesome-solid-book-open: **[Начать чтение](chapters/01-basic-concepts/index.md)**  
   Перейти к первой главе
 
-- :material-format-list-bulleted: **[Оглавление](chapters/)**  
+- :material-format-list-bulleted: **[Оглавление](chapters/index.md)**  
   Полное содержание книги
 
 - :fontawesome-solid-users: **[Об авторах](about/authors.md)**  

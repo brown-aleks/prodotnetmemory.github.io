@@ -1,4 +1,4 @@
-## Введение
+﻿## Введение
 
 ### Что нового во втором издании
 
@@ -153,8 +153,11 @@
 Также есть огромное количество знаний из различных онлайн-блогов и статей. Но вместо того, чтобы заваливать эти страницы их списком, позвольте мне просто перенаправить вас на отличный https://github.com/adamsitnik/awesome-dot-net-performance репозиторий, поддерживаемый Адамом Ситником.
 
 ---
-- [Оглавление](https://brown-aleks.github.io/prodotnetmemory.github.io/src)  
-- [Об авторах](../about/about-the-authors.md)  
-- [О техническом рецензенте](../about/about-the-technical-reviewer.md)  
-- [Благодарности](../about/acknowledgments.md)  
-- [Предисловие](../about/foreword.md)  
+
+## Навигация
+
+- [Об авторах](authors.md)
+- [О рецензенте](technical-reviewer.md)
+- [Благодарности](acknowledgments.md)
+- [Предисловие](foreword.md)
+- [Введение](introduction.md)
