@@ -490,12 +490,13 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 
-# Python
-venv/
-env/
-*.pyc
+# Python caches and environment
 __pycache__/
-.python-version
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
 
 # MkDocs
 site/
@@ -508,6 +509,7 @@ site/
 *.swo
 *~
 .DS_Store
+Thumbs.db
 
 # Node (если остались зависимости)
 node_modules/
