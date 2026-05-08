@@ -10,7 +10,7 @@ repo_name: brown-aleks/prodotnetmemory
 edit_uri: edit/main/docs/
 copyright: |
   Copyright &copy; 2024 Konrad Kokosa, Christophe Nasarre, Kevin Gosse<br>
-  Перевод &copy; 2025 <a href="https://t.me/brown_aleks" target="_blank">Александр Броун</a>
+  Перевод &copy; 2026 <a href="https://t.me/brown_aleks" target="_blank">Александр Броун</a>
 
 # =============================================================================
 # THEME
@@ -41,22 +41,22 @@ theme:
   
   features:
     - announce.dismiss
-    - content.action.edit
-    - content.action.view
+#    - content.action.edit
+#    - content.action.view
     - content.code.annotate
     - content.code.copy
     - content.code.select
     - content.tabs.link
     - content.tooltips
     - header.autohide
-    - navigation.expand
+#    - navigation.expand
     - navigation.footer
     - navigation.indexes
     - navigation.instant
     - navigation.instant.prefetch
     - navigation.instant.progress
     - navigation.path
-    - navigation.sections
+#    - navigation.sections
     - navigation.tabs
     - navigation.tabs.sticky
     - navigation.top
@@ -65,6 +65,7 @@ theme:
     - search.share
     - search.suggest
     - toc.follow
+
 
 # =============================================================================
 # PLUGINS
@@ -153,12 +154,145 @@ nav:
   
   - Главы:
     - chapters/index.md
-    - 1. Базовые концепции: chapters/01-basic-concepts/index.md
-    - 2. Низкоуровневая память: chapters/02-low-level-memory/index.md
-    - 3. Измерения памяти: chapters/03-memory-measurements/index.md
-    - 4. Основы .NET: chapters/04-net-fundamentals/index.md
-  
+    - 1. Базовые концепции:
+      - chapters/01-basic-concepts/index.md
+      - chapters/01-basic-concepts/terms-related-to-memory.md
+      - chapters/01-basic-concepts/manual-memory-management.md
+      - chapters/01-basic-concepts/automatic-memory-management.md
+      - chapters/01-basic-concepts/link-counting.md
+      - chapters/01-basic-concepts/tracking-collector.md
+      - chapters/01-basic-concepts/summary.md
+    
+    - 2. Низкоуровневая память:
+      - chapters/02-low-level-memory/index.md
+      - chapters/02-low-level-memory/hardware.md
+      - chapters/02-low-level-memory/operating-system.md
+      - chapters/02-low-level-memory/numa-and-cpu-groups.md
+      - chapters/02-low-level-memory/summary.md
+      
+    - 3. Измерения памяти:
+      - chapters/03-memory-measurements/index.md
+      - chapters/03-memory-measurements/start-measuring-early.md
+      - chapters/03-memory-measurements/windows-and-linux-environments.md
+      - chapters/03-memory-measurements/summary.md
+      
+    - 4. Основы .NET:
+      - chapters/04-net-fundamentals/index.md
+      - chapters/04-net-fundamentals/net-versions.md
+      - chapters/04-net-fundamentals/net-internals.md
+      - chapters/04-net-fundamentals/assemblies-and-application-domains.md
+      - chapters/04-net-fundamentals/process-memory-regions.md
+      - chapters/04-net-fundamentals/type-system.md
+      - chapters/04-net-fundamentals/strings.md
+      - chapters/04-net-fundamentals/boxing-unboxing.md
+      - chapters/04-net-fundamentals/pass-by-reference.md
+      - chapters/04-net-fundamentals/null.md
+      - chapters/04-net-fundamentals/data-type-localization.md
+      - chapters/04-net-fundamentals/static-data.md
+      - chapters/04-net-fundamentals/summary.md
+      
   - Приложения:
     - Глоссарий: appendix/glossary.md
     - Ресурсы: appendix/resources.md
     - FAQ: appendix/faq.md
+
+#
+#Глава 1: Базовые концепции
+#    Термины, связанные с памятью
+#        Статическое выделение
+#        Регистровая машина.
+#        Стек
+#        Стековая машина
+#        Указатель
+#        Куча
+#    Ручное управление памятью
+#    Автоматическое управление памятью
+#        Аллокатор, мутатор и сборщик
+#    Подсчет ссылок
+#    Отслеживающий сборщик
+#        Фаза маркировки
+#    Резюме
+#        Правило 1 — Самообразование
+#
+#Глава 2: Низкоуровневое управление памятью
+#    Аппаратное обеспечение
+#        Память
+#        CPU
+#    Операционная система
+#        Виртуальная память
+#        Большие страницы
+#        Фрагментация виртуальной памяти
+#        Общая структура памяти
+#        Управление памятью Windows
+#        Структура памяти Windows
+#        Управление памятью Linux
+#        Структура памяти Linux
+#        Влияние операционной системы
+#    NUMA и группы CPU
+#    Резюме
+#        Правило 2 — Случайный доступ следует избегать, последовательный доступ следует поощрять
+#        Правило 3 — Улучшение пространственной и временной локальности данных
+#        Правило 4 — Рассмотрение более продвинутых возможностей
+#
+#Глава 3: Измерение памяти  
+#    Начинайте измерять на ранней стадии  
+#        Накладные расходы и инвазивность  
+#        Выборка против трассировки  
+#        Дерево вызовов  
+#        Графы объектов  
+#        Статистика  
+#        Латентность против пропускной способности  
+#        Дампы памяти, трассировка, отладка в реальном времени  
+#    Окружения Windows и Linux  
+#        Обзор  
+#        VMMap  
+#        Счетчики производительности .NET Framework  
+#        Счетчики .NET Core  
+#        Трассировка событий для Windows  
+#        PerfView  
+#        Инструмент dotnet-trace CLI  
+#        Инструмент dotnet-gcmon CLI  
+#        ProcDump, dotnet-dump  
+#        dotnet-gcdump CLI инструмент  
+#        WinDbg  
+#        dotnet-dump для анализа  
+#        Дизассемблеры и декомпиляторы  
+#        BenchmarkDotNet  
+#        Инструменты от авторов  
+#        Коммерческие инструменты  
+#    Резюме  
+#    Правило 5 — Раннее измерение работы сборщика мусора (GC)
+#
+#Глава 4: Основы .NET
+#    Версии .NET
+#    Внутреннее устройство .NET
+#        Пример программы в деталях
+#    Сборки и домены приложений
+#        Собираемые сборки
+#    Области памяти процесса
+#        Сценарий 4-1 — Насколько велика моя программа в памяти?
+#        Сценарий 4-2 — Использование собственной памяти моей программой продолжает расти
+#        Сценарий 4-3 — Использование виртуальной памяти моей программой продолжает расти
+#        Сценарий 4-4 — Использование управляемой памяти моей программой продолжает расти с ростом количества сборок
+#        Сценарий 4-5 — Моя программа не может выгрузить плагины
+#    Система типов
+#        Категории типов
+#        Хранилище типов
+#        Значимые типы
+#        Ссылочные типы
+#    Строки
+#        Интернирование строк
+#        Сценарий 4-6 — Использование памяти моей программой слишком большое
+#    Упаковка и Распаковка
+#    Передача по ссылке
+#        Передача по ссылке экземпляра значимого типа
+#        Передача по ссылке экземпляра ссылочного типа
+#    Null
+#    Локализация данных типа
+#    Статические данные
+#        Статические поля
+#        Внутренние статические данные
+#    Резюме
+#        Структуры
+#        Классы
+#

@@ -92,6 +92,6 @@ hide:
 <div align="center">
   <small>
     Copyright © 2024 Konrad Kokosa, Christophe Nasarre, Kevin Gosse<br>
-    Перевод © 2025 Александр Броун
+    Перевод © 2026 Александр Броун
   </small>
 </div>
