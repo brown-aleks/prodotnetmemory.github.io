@@ -132,18 +132,25 @@ __Примечание
 
 Виртуальное адресное пространство зависит от версии системы. Краткое изложение этих ограничений приведено в [таблице 2-4](<#t-2-4>).
 
+<a id="t-2-4"></a>
+<figure class="custom-table-wrapper"
+        markdown="1" 
+        style=" --col-min-width: 100px;
+                --col1-width: 80px; --col1-min-width: 80px; --col1-text-align: center;
+                --col2-width: auto; --col2-min-width: 130px;
+                --col3-width: auto; --col3-min-width: 157px;
+                --col4-width: auto; --col4-min-width: 183px;">
+  <figcaption>Таблица 2-4. Ограничения на размер виртуального адресного пространства в Windows (пользователь/ядро)</figcaption>
+
 Тип процесса | Windows (32-Bit) | Windows 8/Server 2012 | Windows 8.1+/Server 2012+  
 ---|---|---|---  
 32-bit | 2/2 GB | 2/2 GB | 2/2 GB  
 32-bit (*) | 3/1 GB | 4 GB/8 TB | 4 GB/128 TB  
 64-bit | - | 8/8 TB | 128/128 TB  
-<a id="t-2-4"></a>  
-Таблица 2-4. Ограничения на размер виртуального адресного пространства в Windows (пользователь/ядро)
+
+</figure>
 
 * Большой флаг учета адресов (также известный как переключатель /3GB)
-
-  
-
 
 __Примечание
 
@@ -265,13 +272,22 @@ __Примечание
 
 Популярные и наиболее часто используемые дистрибутивы операционных систем Linux также используют концепцию виртуальной памяти. Их лимиты на процесс также очень похожи и обобщены в [таблице 2-5](<#t-2-5>).
 
+<a id="t-2-5"></a>  
+<figure class="custom-table-wrapper"
+        markdown="1" 
+        style=" --col-min-width: 100px;
+                --col1-width: 30px; --col1-min-width: 30px; --col1-text-align: center;
+                --col2-width: auto;
+                --col3-width: auto;
+                --col4-width: auto;">
+  <figcaption>Таблица 2-5. Ограничения на размер виртуального адресного пространства в Linux (пользователь/ядро)</figcaption>
   
-\# | Process Type | Linux 32-Bit | Linux 64-Bit  
+№ | Process Type | Linux 32-Bit | Linux 64-Bit  
 ---|---|---|---  
 1 | 32-bit process | 3/1, 2/2, 1/3 GB | -  
 2 | 64-bit process | - | 128/128 TB*  
-<a id="t-2-5"></a>  
-Таблица 2-5. Ограничения на размер виртуального адресного пространства в Linux (пользователь/ядро)
+
+</figure>
 
 *Каноническая 48-битная адресация
 

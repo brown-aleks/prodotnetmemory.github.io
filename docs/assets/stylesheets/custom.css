@@ -65,7 +65,7 @@
 }
 
 /* ------------------------------------------------------------- */
-/* --- Кастомизация для рисунков --- */
+/* --- Кастомизация для рисунков ------------------------------- */
 /* ------------------------------------------------------------- */
 
 /* Стиль контейнера рисунка */
@@ -100,7 +100,7 @@
     width: fit-content;
     margin: 14px; /* Центрирование текста и отступ сверху от картинки */
 }
-
+/* ------------------------------------------------------------- */
 
 /* Стили для кода CLI */
 .language-cli .highlight {
@@ -124,15 +124,173 @@ blockquote.book-quote {
   margin: 2rem 0;
 }
 
-/* Улучшенные таблицы */
-.md-typeset table:not([class]) {
-  font-size: 0.9rem;
+/* ------------------------------------------------------------- */
+/* --- Кастомизация таблиц с управлением ширины колонок -------- */
+/* ------------------------------------------------------------- */
+
+/* Полностью отключаем механизмы прокрутки и тени самой темы Material для этого блока */
+.custom-table-wrapper .md-typeset__scrollwrap,
+.custom-table-wrapper .md-typeset__table {
+    overflow: visible !important;
+    background-image: none !important; /* Убираем градиент-тени Material */
+    margin: 0 !important;
+    padding: 0 !important;
 }
 
-.md-typeset table:not([class]) th {
-  background-color: var(--md-primary-fg-color);
-  color: var(--md-primary-bg-color);
+/* Контейнер таблицы */
+.custom-table-wrapper {
+    --col-min-width-default: 30px; /* Минимальная ширина для всех ячеек, если не указано индивидуально */
+    --col-text-align-default: left; /* Выравнивание текста по умолчанию для всех колонок */
+
+    overflow-x: auto !important;
+    width: 100%;
+    padding: 0 !important;
+    margin: 2rem 0;
+    /* Оптимизация для мобильных: плавный скролл пальцем */
+    -webkit-overflow-scrolling: touch;
 }
+
+/* Оформление названия таблицы (Caption) */
+.custom-table-wrapper figcaption {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--md-default-fg-color);
+    text-align: left ; /* В книгах таблицы обычно подписывают слева */
+    margin-bottom: 5px !important; /* Уменьшаем отступ снизу */
+    margin-left: 35px;
+    max-width: 26rem !important;
+    font-family: var(--md-text-font);
+    border-bottom: 0px solid var(--md-primary-fg-color); /* Красивая линия под заголовком */
+    padding-bottom: 0px;
+    opacity: 0.9;
+}
+
+/* Сброс лишних стилей Material для нашей обертки */
+.custom-table-wrapper .md-typeset__table {
+    min-width: 100%;
+    margin: 0;
+}
+
+.custom-table-wrapper table {
+    display: table !important;
+    box-sizing: border-box !important;
+    width: auto !important;
+    min-width: 100% !important;
+    margin: 0 !important;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    /* Фон и текст подстраиваются автоматически */
+    background-color: var(--md-default-bg-color);
+    color: var(--md-default-fg-color);
+    /* Убираем рамки по бокам для более "чистого" книжного вида */
+    border-left: none; 
+    border-right: none;
+    table-layout: fixed !important; /* Строго соблюдать ширину из переменных */
+    word-wrap: break-word; /* Разрывать длинные слова, если они не влезают */
+}
+
+/* Шапка таблицы */
+.custom-table-wrapper th {
+    /* Легкая тонировка, которая работает в обеих темах */
+    background-color: var(--md-default-fg-color--lightest); 
+    color: var(--md-default-fg-color);
+    font-weight: bold;
+    padding: 5px 5px !important;
+    border: 1px solid var(--md-default-fg-color--lightest);
+    text-align: left;
+    vertical-align: bottom;
+}
+
+/* Ячейки с данными */
+.custom-table-wrapper td {
+    padding: 5px 5px !important;
+    /* Границы между строками теперь адаптивные */
+    border: 1px solid var(--md-default-fg-color--lightest);
+    vertical-align: top;
+}
+
+/* --- КОМПАКТНЫЕ СПИСКИ ВНУТРИ ТАБЛИЦ --- */
+.custom-table-wrapper td ul {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-left: 0 !important; /* Уменьшенный отступ для маркеров (точек) */
+}
+
+.custom-table-wrapper td ul li {
+    margin-bottom: 0.3rem; /* Небольшой интервал между пунктами списка */
+    line-height: 1.4;
+}
+
+.custom-table-wrapper td ul li:last-child {
+    margin-bottom: 0; /* Убираем лишний отступ у последнего элемента */
+}
+
+/* Опционально: стилизация плюсов и минусов для визуального выделения */
+.custom-table-wrapper td ul li span.plus {
+    color: var(--md-code-hl-string-color); /* Зеленоватый оттенок из темы */
+    font-weight: bold;
+}
+.custom-table-wrapper td ul li span.minus {
+    color: var(--md-code-hl-number-color); /* Красноватый оттенок из темы */
+    font-weight: bold;
+}
+
+/* --- ЭФФЕКТ ЗЕБРЫ (АДАПТИВНЫЙ) --- */
+/* Используем прозрачное наслоение (rgba).
+   Оно будет чуть затемнять светлую тему и чуть осветлять темную. */
+.custom-table-wrapper tbody tr:nth-child(even) {
+    background-color: var(--md-default-fg-color--lightest);
+}
+
+/* Эффект наведения на строку */
+.custom-table-wrapper tbody tr:hover {
+    /* Используем акцентный цвет темы с прозрачностью */
+    background-color: var(--md-accent-fg-color--transparent);
+    transition: background-color 0.2s ease;
+}
+
+/* --- МАГИЯ ШИРИНЫ КОЛОНОК --- */
+/* Если переменная задана в HTML, применяется она. Если нет - значение auto */
+.custom-table-wrapper th:nth-child(1),
+.custom-table-wrapper td:nth-child(1) {
+    width: var(--col1-width, auto) !important;
+    min-width: var(--col1-min-width, var(--col-min-width, var(--col-min-width-default))) !important;
+    text-align: var(--col1-text-align, var(--col-text-align-default)) !important;
+}
+.custom-table-wrapper th:nth-child(2),
+.custom-table-wrapper td:nth-child(2) {
+    width: var(--col2-width, auto) !important;
+    min-width: var(--col2-min-width, var(--col-min-width, var(--col-min-width-default))) !important;
+    text-align: var(--col2-text-align, var(--col-text-align-default)) !important;
+}
+.custom-table-wrapper th:nth-child(3),
+.custom-table-wrapper td:nth-child(3) {
+    width: var(--col3-width, auto) !important;
+    min-width: var(--col3-min-width, var(--col-min-width, var(--col-min-width-default))) !important;
+    text-align: var(--col3-text-align, var(--col-text-align-default)) !important;
+}
+.custom-table-wrapper th:nth-child(4),
+.custom-table-wrapper td:nth-child(4) {
+    width: var(--col4-width, auto) !important;
+    min-width: var(--col4-min-width, var(--col-min-width, var(--col-min-width-default))) !important;
+    text-align: var(--col4-text-align, var(--col-text-align-default)) !important;
+}
+.custom-table-wrapper th:nth-child(5),
+.custom-table-wrapper td:nth-child(5) {
+    width: var(--col5-width, auto) !important;
+    min-width: var(--col5-min-width, var(--col-min-width, var(--col-min-width-default))) !important;
+    text-align: var(--col5-text-align, var(--col-text-align-default)) !important;
+}
+.custom-table-wrapper th:nth-child(6),
+.custom-table-wrapper td:nth-child(6) {
+    width: var(--col6-width, auto) !important;
+    min-width: var(--col6-min-width, var(--col-min-width, var(--col-min-width-default))) !important;
+    text-align: var(--col6-text-align, var(--col-text-align-default)) !important;
+}
+/* Если будут таблицы на 7-8 колонок, просто добавить аналогичные строки ниже */
+
+/* ------------------------------------------------------------- */
 
 /* Прогресс перевода */
 .translation-progress {
