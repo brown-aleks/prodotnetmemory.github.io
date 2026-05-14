@@ -240,34 +240,35 @@ __Примечание
 
 Стоимость непоследовательных шаблонов доступа к памяти была проиллюстрирована примером кода из [Листинга 2-1](<#l-2-1>) и результатами в [Таблице 2-1](<#t-2-1>). Примерная программа обращается к одному и тому же двумерному массиву двумя способами – построчно и по столбцам. Результаты представлены для трех различных сред: ПК (Intel Core i7-4770K 3.5GHz), ноутбук (Intel Core i7-4712MQ 2.3GHz) и плата Raspberry Pi 2 (ARM Cortex-A7 0.9GHz).
 
-  
-
 <a id="l-2-1"></a>        
-    
-    
-        
-          // По строкам
-          int[,] tab = new int[n, m];
-          for (int i = 0; i < n; ++i)
-          {
-            for (int j = 0; j < m; ++j)
-            {
-              tab[i, j] = 1;
-            }
-          }
-    
-          // По столбцам
-          int[,] tab = new int[n, m];
-          for (int i = 0; i < n; ++i)
-          {
-            for (int j = 0; j < m; ++j)
-            {
-              tab[j, i] = 1;
-            }
-          }
-      
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-Листинг 2-1. Индексация по столбцам и строкам при доступе к массиву (массив 5000x5000 целых чисел)
+``` cpp title="listing-2-1.cpp" linenums="1"
+// По строкам
+int[,] tab = new int[n, m];
+for (int i = 0; i < n; ++i)
+{
+  for (int j = 0; j < m; ++j)
+  {
+    tab[i, j] = 1;
+  }
+}
+
+// По столбцам
+int[,] tab = new int[n, m];
+for (int i = 0; i < n; ++i)
+{
+  for (int j = 0; j < m; ++j)
+  {
+    tab[j, i] = 1;
+  }
+}
+```     
+
+  <figcaption>Листинг 2-1. Индексация по столбцам и строкам при доступе к массиву (массив 5000x5000 целых чисел)
+  </figcaption>
+</figure>
 
 <a id="t-2-1"></a>
 <figure class="custom-table-wrapper"
@@ -337,53 +338,56 @@ __Примечание
 
 Вы можете избежать такого трафика кэша, используя так называемый набор ассемблерных инструкций не временного доступа – MOVNTI, MOVNTQ, MOVNTDQ и т.д. Они позволяют программисту предотвратить кэширование данных во время записи в память. Они доступны через набор функций C/C++ `_mm_stream_*`, поэтому для их использования не требуется ассемблер. Например, `_mm_stream_si128` выполняет инструкцию MOVNTDQ, которая записывает один квадро-слово (4 слова по 4 байта) непосредственно в память. Пример быстрой инициализации массива с использованием этой техники показан в [Листинге 2-2](<#l-2-2>).
 
-  
+<a id="l-2-2"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-<a id="l-2-2"></a>        
-    
-    
-        
-          #include <emmintrin.h>
-          void setbytes(char *p, int c)
-          {
-            __m128i i = _mm_set_epi8(c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c); // sets 16 
-            signed 8-bit integer values
-            _mm_stream_si128((__m128i *)&p;[0], i);
-            _mm_stream_si128((__m128i *)&p;[16], i);
-            _mm_stream_si128((__m128i *)&p;[32], i);
-            _mm_stream_si128((__m128i *)&p;[48], i);
-          }
-      
+``` cpp title="listing-2-2.cpp" linenums="1"
+#include <emmintrin.h>
+void setbytes(char *p, int c)
+{
+  __m128i i = _mm_set_epi8(c, c, c, c, c, c, c, c, c, c, c, c, c, c, c, c); // sets 16 
+  signed 8-bit integer values
+  _mm_stream_si128((__m128i *)&p;[0], i);
+  _mm_stream_si128((__m128i *)&p;[16], i);
+  _mm_stream_si128((__m128i *)&p;[32], i);
+  _mm_stream_si128((__m128i *)&p;[48], i);
+}
+```     
 
-Листинг 2-2. Пример использования низкоуровневого API в C++ для не временных записей
+  <figcaption>Листинг 2-2. Пример использования низкоуровневого API в C++ для не временных записей</figcaption>
+</figure>
 
 Упомянутые выше аппаратные встроенные функции доступны с .NET Core 3.0 и также включают возможность использования не временного доступа.
 
 Вы можете использовать набор функций StoreAlignedNonTemporal, которые будут переведены JIT-компилятором в одну из инструкций MOVNTxx, в зависимости от типа данных памяти, к которой вы обращаетесь (байты, целые числа, числа с плавающей запятой и т.д.).
 
 В [Листинге 2-3](<#l-2-3>) вы можете увидеть пример простой программы, которая умножает значения из входного массива на 2 партиями, сохраняя их с помощью вышеупомянутого метода.
-    
-    
-<a id="l-2-3"></a>        
-        
-          int simdLength = Vector<float>.Count;
-          var vec2 = new Vector<float>(2.0f);
-    
-          unsafe
-          {
-            fixed (float* p = outputArray)
-            {
-              for (; i <= arrayLength - simdLength; i += simdLength)
-              {
-                var vector = new Vector<float>(inputArray, i);
-                vector = vector * vec2;
-                vector.StoreAlignedNonTemporal(p + i);
-              }
-            }
-          }
-      
 
-Листинг 2-3. Пример использования аппаратных встроенных функций для использования не временного доступа
+<a id="l-2-3"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
+
+``` cpp title="listing-2-3.cpp" linenums="1"
+int simdLength = Vector<float>.Count;
+var vec2 = new Vector<float>(2.0f);
+
+unsafe
+{
+  fixed (float* p = outputArray)
+  {
+    for (; i <= arrayLength - simdLength; i += simdLength)
+    {
+      var vector = new Vector<float>(inputArray, i);
+      vector = vector * vec2;
+      vector.StoreAlignedNonTemporal(p + i);
+    }
+  }
+}
+```      
+
+  <figcaption>Листинг 2-3. Пример использования аппаратных встроенных функций для использования не временного доступа</figcaption>
+</figure>
 
 Одна сложная вещь, которую нужно помнить, заключается в том, что такие записи должны быть "выровнены". То есть, адреса памяти, к которым вы записываете с помощью StoreAlignedNonTemporal, должны быть кратны размеру строки кэша (32 байта). Это не гарантируется по умолчанию для обычных управляемых массивов float, поэтому вам нужно решить эту проблему двумя возможными способами:
 
@@ -416,40 +420,43 @@ __Примечание
 
 Предварительная выборка, как и все другие механизмы кэширования, является обоюдоострым оружием. Если вы хорошо понимаете шаблоны доступа к памяти в вашем коде, то использование предварительной выборки может заметно ускорить производительность вашей программы. С другой стороны, очень сложно быть уверенным, что вы правильно понимаете эти шаблоны доступа к памяти, учитывая очень широкий контекст, в котором работает ваш код – под влиянием других потоков в вашей программе, потоков других программ и потоков самой операционной системы. Время имеет решающее значение: если вы выполните предварительную выборку слишком поздно, данные не будут доступны, когда они вам понадобятся. С другой стороны, если вы выполните предварительную выборку слишком рано, данные могут быть вытеснены из кэша к тому времени, когда вы начнете их использовать. Предварительная выборка используется сборщиком мусора на x86, x64 и ARM64 (см. [Листинг 2-4](<#l-2-4>)).
     
-    
-        
-          // enable on processors known to have a useful prefetch instruction
-          #if defined(TARGET_AMD64) || defined(TARGET_X86) || defined(TARGET_ARM64)
-          #define PREFETCH
-          #endif
-          #ifdef PREFETCH
-          inline void Prefetch(void* addr)
-          {
-          #ifdef TARGET_WINDOWS
-          #if defined(TARGET_AMD64) || defined(TARGET_X86)
-          #ifndef _MM_HINT_T0
-          #define _MM_HINT_T0 1
-          #endif
-            _mm_prefetch((const char*)addr, _MM_HINT_T0);
-          #elif defined(TARGET_ARM64)
-            __prefetch((const char*)addr);
-          #endif //defined(TARGET_AMD64) || defined(TARGET_X86)
-          #elif defined(TARGET_UNIX)
-            __builtin_prefetch(addr);
-          #else //!(TARGET_WINDOWS || TARGET_UNIX)
-          UNREFERENCED_PARAMETER(addr);
-          #endif //TARGET_WINDOWS
-          }
-          #else //PREFETCH
-          inline void Prefetch (void* addr)
-          {
-            UNREFERENCED_PARAMETER(addr);
-          }
-          #endif //PREFETCH
-<a id="l-2-4"></a>        
-      
+<a id="l-2-4"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-Листинг 2-4. Части кода .NET, связанные с предварительной выборкой, в зависимости от архитектуры   
+``` csharp title="listing-2-4.cs" linenums="1"
+// enable on processors known to have a useful prefetch instruction
+#if defined(TARGET_AMD64) || defined(TARGET_X86) || defined(TARGET_ARM64)
+#define PREFETCH
+#endif
+#ifdef PREFETCH
+inline void Prefetch(void* addr)
+{
+#ifdef TARGET_WINDOWS
+#if defined(TARGET_AMD64) || defined(TARGET_X86)
+#ifndef _MM_HINT_T0
+#define _MM_HINT_T0 1
+#endif
+  _mm_prefetch((const char*)addr, _MM_HINT_T0);
+#elif defined(TARGET_ARM64)
+  __prefetch((const char*)addr);
+#endif //defined(TARGET_AMD64) || defined(TARGET_X86)
+#elif defined(TARGET_UNIX)
+  __builtin_prefetch(addr);
+#else //!(TARGET_WINDOWS || TARGET_UNIX)
+UNREFERENCED_PARAMETER(addr);
+#endif //TARGET_WINDOWS
+}
+#else //PREFETCH
+inline void Prefetch (void* addr)
+{
+  UNREFERENCED_PARAMETER(addr);
+}
+#endif //PREFETCH
+```     
+
+  <figcaption>Листинг 2-4. Части кода .NET, связанные с предварительной выборкой, в зависимости от архитектуры процессора</figcaption>
+</figure>
 
 
 __Примечание
@@ -498,37 +505,37 @@ __Примечание
 
 Очевидно ухудшение времени доступа, когда размер данных превышает размер кэша каждого уровня. Поскольку тесты проводились на процессоре Intel i7-4770K, четко видны точки деградации производительности около 256 КБ и 8192 КБ, что соответствует размерам кэша L2 и L3. Вы можете видеть, что работа с небольшими размерами данных может быть в несколько раз быстрее, чем работа с данными, которые не помещаются в кэш L3.
 
-  
+<a id="l-2-5"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-<a id="l-2-5"></a>        
-    
-    
-        
-          public struct OneLineStruct
-          {
-            public long data1;
-            public long data2;
-            public long data3;
-            public long data4;
-            public long data5;
-            public long data6;
-            public long data7;
-            public long data8;
-          }
-    
-          public static long OneLineStructSequentialReadPattern(OneLineStruct[] tab)
-          {
-            long sum = 0;
-            int n = tab.Length;
-            for (int i = 0; i < n; ++i)
-            {
-              unchecked { sum += tab[i].data1; }
-            }
-            return sum;
-          }
-      
+``` csharp title="listing-2-5.cs" linenums="1"
+public struct OneLineStruct
+{
+  public long data1;
+  public long data2;
+  public long data3;
+  public long data4;
+  public long data5;
+  public long data6;
+  public long data7;
+  public long data8;
+}
 
-Листинг 2-5. Последовательное чтение следующих строк кэша
+public static long OneLineStructSequentialReadPattern(OneLineStruct[] tab)
+{
+  long sum = 0;
+  int n = tab.Length;
+  for (int i = 0; i < n; ++i)
+  {
+    unchecked { sum += tab[i].data1; }
+  }
+  return sum;
+}
+```     
+
+  <figcaption>Листинг 2-5. Последовательное чтение следующих строк кэша</figcaption>
+</figure>
 
 <a id="f-2-11"></a>
 <figure markdown="span" class="custom-figure">
@@ -574,33 +581,38 @@ __Примечание
 
 [Листинг 2-6](<#l-2-6>) показывает многопоточный код, который может одновременно запускать количество потоков, равное threadsCount, обращающихся к одному и тому же массиву sharedData. Каждый поток просто увеличивает один элемент массива, теоретически не влияя на другие потоки. В этом примере есть два важных параметра, указывающих, как эти элементы расположены в общем массиве – есть ли начальный зазор и насколько они удалены друг от друга (смещение). Поскольку этот код выполняется при threadsCount=4 на четырех-ядерной машине, вероятно, что каждый поток будет выполняться на своем физическом ядре.
     
-<a id="l-2-6"></a>     
-        
-          const int offset = 1;
-          const int gap = 0;
-          public static int[] sharedData = new int[4 * offset + gap * offset];
-          public static long DoFalseSharingTest(int threadsCount, int size = 100_000_000)
-          {
-            Thread[] workers = new Thread[threadsCount];
-            for (int i = 0; i < threadsCount; ++i)
-            {
-              workers[i] = new Thread(new ParameterizedThreadStart(idx =>
-              {
-                int index = (int)idx + gap;
-                for (int j = 0; j < size; ++j)
-                {
-                  sharedData[index * offset] = sharedData[index * offset] + 1;
-                }
-              }));
-            }
-            for (int i = 0; i < threadsCount; ++i)
-              workers[i].Start(i);
-            for (int i = 0; i < threadsCount; ++i)
-              workers[i].Join();
-            return 0;
-          }
-       
-Листинг 2-6. Возможность ложного совместного использования между потоками 
+<a id="l-2-6"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
+
+``` csharp title="listing-2-6.cs" linenums="1" 
+const int offset = 1;
+const int gap = 0;
+public static int[] sharedData = new int[4 * offset + gap * offset];
+public static long DoFalseSharingTest(int threadsCount, int size = 100_000_000)
+{
+  Thread[] workers = new Thread[threadsCount];
+  for (int i = 0; i < threadsCount; ++i)
+  {
+    workers[i] = new Thread(new ParameterizedThreadStart(idx =>
+    {
+      int index = (int)idx + gap;
+      for (int j = 0; j < size; ++j)
+      {
+        sharedData[index * offset] = sharedData[index * offset] + 1;
+      }
+    }));
+  }
+  for (int i = 0; i < threadsCount; ++i)
+    workers[i].Start(i);
+  for (int i = 0; i < threadsCount; ++i)
+    workers[i].Join();
+  return 0;
+}
+```       
+
+  <figcaption>Листинг 2-6. Возможность ложного совместного использования между потоками </figcaption>
+</figure>
 
 <a id="t-2-3"></a>
 <figure class="custom-table-wrapper"

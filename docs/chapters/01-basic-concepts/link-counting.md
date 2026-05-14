@@ -9,59 +9,63 @@ description: Базовые концепции
 
 Живучесть объектов в подходе подсчета ссылок зависит от количества объектов, ссылающихся на каждый из них. Если счетчик падает до нуля, никто не ссылается на объект, и таким образом, он может быть освобожден. Но что, если счетчик не падает до нуля? Это ничего не говорит о живости объекта — это говорит только о том, что кто-то хранит ссылку на него, а не о том, что он будет ее использовать. Таким образом, подсчет ссылок — это еще один способ угадать живость объекта.
 
-Возвращаясь к нашему тривиальному примеру Mutator из [листинга 1-6](<#l-1-6>), в случае подсчета ссылок его можно было бы описать так, как показано в [листинге 1-7](<#l-1-7>).
+Возвращаясь к нашему тривиальному примеру Mutator из [листинга 1-6](<../automatic-memory-management/#l-1-6>), в случае подсчета ссылок его можно было бы описать так, как показано в [листинге 1-7](<#l-1-7>).
 
-  
+<a id="l-1-7"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-    
-    
-        
-          Mutator.New(amount)
-          {
-            obj = Allocator.Allocate(amount);
-            obj.counter = 0;
-            return obj;
-          }
-          Mutator.Write(address, value)
-          {
-            if (address != NULL)
-              ReferenceCountingCollector.DecreaseCounter(address);
-            *address = value;
-            if (value != NULL)
-              value.counter++;
-          }
-          ReferenceCountingCollector.DecreaseCounter(address)
-          {
-            *address.counter--;
-            if (*address.counter == 0)
-              Allocator.Deallocate(address)
-          }
-<a id="l-1-7"></a>        
-      
+``` C title="listing-1-7.c" linenums="1"
+Mutator.New(amount)
+{
+  obj = Allocator.Allocate(amount);
+  obj.counter = 0;
+  return obj;
+}
+Mutator.Write(address, value)
+{
+  if (address != NULL)
+    ReferenceCountingCollector.DecreaseCounter(address);
+  *address = value;
+  if (value != NULL)
+    value.counter++;
+}
+ReferenceCountingCollector.DecreaseCounter(address)
+{
+  *address.counter--;
+  if (*address.counter == 0)
+    Allocator.Deallocate(address)
+}
+```      
 
-Листинг 1-7. Псевдокод, описывающий простой алгоритм подсчета ссылок
+  <figcaption>Листинг 1-7. Псевдокод, описывающий простой алгоритм подсчета ссылок</figcaption>
+</figure>
 
 Поведение подсчета ссылок иллюстрируется простой программой на [рисунке 1-11](<#f-1-11>) и [листинге 1-8](<#l-1-8>). Три простые строки кода переписаны в терминах методов Mutators, чтобы показать, как изменяются ссылки.
 
 <a id="l-1-8"></a>        
-        
-          o1 = new SomeObject();
-          o2 = new SomeObject();
-          o2 = o1;
-          // becomes:
-          addr1 = Mutator.New(SizeOf(SomeObject))    
-          Mutator.Write(&o1;, addr1)                  
-          addr2 = Mutator.New(SizeOf(SomeObject))    
-          Mutator.Write(&o2;, addr2)                  
-          Mutator.Write(&o2;, &o1;)                    
-          // addr1.counter = 0
-          // addr1.counter = 1
-          // addr2.counter = 0
-          // addr2.counter = 1
-          // addr1.counter = 0; addr2.counter = 2
-      
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-Листинг 1-8. Пример псевдокода, иллюстрирующий подсчет ссылок
+``` C title="listing-1-8.c" linenums="1"
+o1 = new SomeObject();
+o2 = new SomeObject();
+o2 = o1;
+// becomes:
+addr1 = Mutator.New(SizeOf(SomeObject))    
+Mutator.Write(&o1;, addr1)                  
+addr2 = Mutator.New(SizeOf(SomeObject))    
+Mutator.Write(&o2;, addr2)                  
+Mutator.Write(&o2;, &o1;)                    
+// addr1.counter = 0
+// addr1.counter = 1
+// addr2.counter = 0
+// addr2.counter = 1
+// addr1.counter = 0; addr2.counter = 2
+```      
+
+  <figcaption>Листинг 1-8. Пример псевдокода, иллюстрирующий подсчет ссылок</figcaption>
+</figure>
 
 <a id="f-1-11"></a>
 <figure markdown="span" class="custom-figure">
@@ -90,35 +94,38 @@ description: Базовые концепции
 
 
 
-В [листинге 1-9](<#l-1-9>) вы можете увидеть код из [листинга 1-5](<#l-1-5>), переписанный на C++ с использованием интеллектуальных указателей.
+В [листинге 1-9](<#l-1-9>) вы можете увидеть код из [листинга 1-5](<../manual-memory-management/#l-1-5>), переписанный на C++ с использованием интеллектуальных указателей.
     
-    
-        
-          #include <iostream>
-          #include <memory>
-          void printReport(std::shared_ptr<int> data)
-          {
-            std::cout << "Report: " << *data << "\n";
-          }
-          int main()
-          {
-            try
-            {
-              std::shared_ptr<int> ptr(new int());
-              *ptr = 25;
-              printReport(ptr);
-              return 0;
-            }
-            catch (std::bad_alloc& ba)
-            {
-              std::cout << "ERROR: Out of memory\n";
-              return 1;
-            }
-          }
-<a id="l-1-9"></a>        
-      
+<a id="l-1-9"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-Листинг 1-9. Пример программы на C++, демонстрирующей автоматизированное управление памятью с использованием интеллектуальных указателей
+``` cpp title="listing-1-9.cpp" linenums="1"
+#include <iostream>
+#include <memory>
+void printReport(std::shared_ptr<int> data)
+{
+  std::cout << "Report: " << *data << "\n";
+}
+int main()
+{
+  try
+  {
+    std::shared_ptr<int> ptr(new int());
+    *ptr = 25;
+    printReport(ptr);
+    return 0;
+  }
+  catch (std::bad_alloc& ba)
+  {
+    std::cout << "ERROR: Out of memory\n";
+    return 1;
+  }
+}
+```      
+
+  <figcaption>Листинг 1-9. Пример программы на C++, демонстрирующей автоматизированное управление памятью с использованием интеллектуальных указателей</figcaption>
+</figure>
 
 Если бы мы вызвали метод data.use_count() (который возвращает счетчик ссылок) внутри функции printReport, он бы вернул значение 2. Это потому, что два разных общих указателя указывают на один и тот же объект: изначально созданный в main() и копия, сделанная при передаче аргумента data по значению. С другой стороны, после выхода из области действия блока try счетчик использования будет равен нулю, поскольку больше ни один умный указатель не указывает на наш объект.
 

@@ -1102,32 +1102,35 @@ NetExt (от Родни Вианы, доступно по адресу <https://
 
 Подготовка простого теста проиллюстрирована в [листинге 3-5](<#l-3-5>). Как вы видите, большая часть конфигурации выполняется через атрибуты. Вы также можете добавлять параметры для создания различных вариаций бенчмарка (например, N в нашем примере).
     
-    
-          
-    [BenchmarkDotNet.Attributes.Jobs.ShortRunJob]
-    [MemoryDiagnoser]
-    public class TailCallTest
-    {
-        [Params(5, 10, 20)]
-        public int N { get; set; }
-        [Benchmark]
-        public long FibonacciRecursive()
-        {
-            return FibonacciRecursiveHelper(N);
-        }
-        private long FibonacciRecursiveHelper(long n)
-        {
-            if (n < 3)
-                return 1;
-            return FibonacciRecursiveHelper(n - 2) + FibonacciRecursiveHelper(n - 1);
-        }
-    }
-<a id="l-3-5"></a>          
-        
+<a id="l-3-5"></a>
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-Листинг 3-5. Пример теста BenchmarkDotnet
+``` csharp title="listing-3-5.cs" linenums="1"
+[BenchmarkDotNet.Attributes.Jobs.ShortRunJob]
+[MemoryDiagnoser]
+public class TailCallTest
+{
+  [Params(5, 10, 20)]
+  public int N { get; set; }
+  [Benchmark]
+  public long FibonacciRecursive()
+  {
+      return FibonacciRecursiveHelper(N);
+  }
+  private long FibonacciRecursiveHelper(long n)
+  {
+      if (n < 3)
+          return 1;
+      return FibonacciRecursiveHelper(n - 2) + FibonacciRecursiveHelper(n - 1);
+  }
+}
+```
 
-Чтобы выполнить тест, представленный в [листинге 3-5](<#l-3-5>), достаточно просто вызвать BenchmarkRunner. Run<TailCallTest>() в вашей программе. Результат этого теста (см. [рисунок 3-31](<#f-3-31>)) показывает среднее время выполнения каждого метода для каждого параметра и для двух разных JIT (Just In Time) компиляторов, что приводит к богатым статистическим данным о результатах.
+  <figcaption>Листинг 3-5. Пример теста BenchmarkDotnet</figcaption>
+</figure>
+
+Чтобы выполнить тест, представленный в [листинге 3-5](<#l-3-5>), достаточно просто вызвать `BenchmarkRunner. Run<TailCallTest>()` в вашей программе. Результат этого теста (см. [рисунок 3-31](<#f-3-31>)) показывает среднее время выполнения каждого метода для каждого параметра и для двух разных JIT (Just In Time) компиляторов, что приводит к богатым статистическим данным о результатах.
 
 <a id="f-3-31"></a>
 <figure markdown="span" class="custom-figure">

@@ -380,7 +380,7 @@ blockquote.book-quote {
   color: var(--md-accent-fg-color);
 }
 
-/* --- СТИЛИЗАЦИЯ НАВИГАЦИИ (СКОРРЕКТИРОВАНО) --- */
+/* --- СТИЛИЗАЦИЯ НАВИГАЦИИ --- */
 
 /* 1. Увеличиваем отступ для всего второго уровня (вложенные элементы) */
 /* Целимся в список, который находится внутри второго уровня nav */
@@ -405,5 +405,96 @@ blockquote.book-quote {
     /* Гарантируем, что шрифт не будет жирным */
     font-weight: normal !important; 
 }
-
 /* ------------------------------------------------------ */
+
+/* ============================================================== */
+/* === СТИЛИЗАЦИЯ КАСТОМНЫХ БЛОКОВ КОДА (FINAL STABLE) === */
+/* ============================================================== */
+
+/* 1. Общий контейнер */
+.md-typeset .custom-code-wrapper {
+    margin: 1.5em 0;
+    text-align: left;
+}
+
+/* 2. Подпись к листингу (Правка: отступ 10px, маркер 0) */
+.md-typeset .custom-code-wrapper figcaption {
+    font-size: 0.8em;
+    line-height: 1.4;
+    color: var(--md-default-fg-color--light);
+    padding-top: 10px;
+    margin-top: 0;
+    text-align: left;
+}
+
+/* 3. Базовые настройки таблицы */
+.md-typeset .custom-code-wrapper .highlighttable {
+    margin: 0;
+    border-collapse: separate;
+    border-spacing: 0;
+    width: 100%;
+}
+
+/* ============================================================== */
+/* 4. Оформление заголовка "Вкладки" */
+/* ============================================================== */
+
+.md-typeset .custom-code-wrapper .highlighttable th.filename {
+    background: transparent;
+    border: none;
+    padding: 0;
+    text-align: left;
+}
+
+/* Правки: шрифт 0.6em, цвет light, смещение влево 16px */
+.md-typeset .custom-code-wrapper .highlighttable th.filename span.filename {
+    display: inline-block;
+    background-color: var(--md-code-bg-color);
+    color: var(--md-default-fg-color--light); 
+    font-family: var(--md-code-font);
+    font-size: 0.7em; 
+    font-weight: bold;
+    padding: 4px 16px;
+    
+    border: 1px solid var(--md-default-fg-color--lighter);
+    border-bottom: 1px solid var(--md-code-bg-color);
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    
+    position: relative;
+    top: 1px;
+    left: 16px; /* Твое смещение из CSS-Changes.txt */
+    z-index: 2;
+}
+
+/* ============================================================== */
+/* 5. Рамки и скругления основного поля кода */
+/* ============================================================== */
+
+/* Левая ячейка (номера строк) - Правка: верхний левый угол теперь 6px */
+.md-typeset .custom-code-wrapper .highlighttable td.linenos {
+    border-top: 1px solid var(--md-default-fg-color--lighter);
+    border-bottom: 1px solid var(--md-default-fg-color--lighter);
+    border-left: 1px solid var(--md-default-fg-color--lighter);
+    border-top-left-radius: 6px; 
+    border-bottom-left-radius: 6px;
+    background-color: var(--md-code-bg-color);
+}
+
+/* Правая ячейка (код) - Правка: добавлено padding-right 4px */
+.md-typeset .custom-code-wrapper .highlighttable td.code {
+    border-top: 1px solid var(--md-default-fg-color--lighter);
+    border-bottom: 1px solid var(--md-default-fg-color--lighter);
+    border-right: 1px solid var(--md-default-fg-color--lighter);
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+    background-color: var(--md-code-bg-color);
+    padding-right: 4px; 
+}
+
+/* Убираем лишние отступы у внутренних пре-блоков */
+.md-typeset .custom-code-wrapper .highlighttable td.code .highlight pre {
+    margin: 0;
+    padding: 10px 0;
+}
+

@@ -20,20 +20,20 @@ description: Низкоуровневое управление памятью
 
 Вы можете включить осведомленность о группах CPU в средах выполнения .NET на базе Windows (см. [Листинг 2-7](<#l-2-7>)), что является важным в средах с более чем 64 логическими процессорами, если вы хотите, чтобы ваш процесс использовал все ресурсы машины.
 
-  
+<a id="l-2-7"></a>  
+<figure class="custom-code-wrapper"
+        markdown="1">
 
-    
-    
-        
-          <configuration>
-            <runtime>
-              <GCCpuGroup enabled="true"/>
-              <gcServer enabled="true"/>
-            </runtime>
-          </configuration>
-<a id="l-2-7"></a>        
-      
+``` xml title="listing-2-7.csproj" linenums="1"
+<configuration>
+  <runtime>
+    <GCCpuGroup enabled="true"/>
+    <gcServer enabled="true"/>
+  </runtime>
+</configuration>
+```      
 
-Листинг 2-7. Настройка осведомленности о группе процессоров в среде выполнения .NET
+  <figcaption>Листинг 2-7. Настройка осведомленности о группе процессоров в среде выполнения .NET</figcaption>
+</figure>
 
 Параметр `GCCpuGroup` определяет, должен ли сборщик мусора (Garbage Collector) поддерживать группы CPU путем создания внутренних потоков сборки мусора во всех доступных группах и учитывать все доступные ядра при создании и управлении кучами. Этот параметр следует включать одновременно с параметром `gcServer`.
