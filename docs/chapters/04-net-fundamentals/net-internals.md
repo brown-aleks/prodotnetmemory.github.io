@@ -252,23 +252,19 @@ Bp expression 'coreclr!EEShutDown' could not be resolved, adding deferred bp
 !name2ee CoreCLR.HelloWorld.dll!HelloWorld.Program.Main
 
 Следующий вывод показывает, что JIT-код для метода Main расположен по адресу 00007ffb47df0ab0:
-    
-    
-          
-    
-    
-              
-    Module:      00007ffb47ec2448
-    Assembly:    CoreCLR.HelloWorld.dll
-    Token:       0000000006000001
-    MethodDesc:  00007ffb47ec4398
-    Name:        HelloWorld.Program.Main(System.String[])
-    JITTED Code Address: 00007ffb47df0ab0
-              
-          
-    
-    
-      
+
+<figure class="console-wrapper" markdown="1">
+
+``` text
+Module:      00007ffb47ec2448
+Assembly:    CoreCLR.HelloWorld.dll
+Token:       0000000006000001
+MethodDesc:  00007ffb47ec4398
+Name:        HelloWorld.Program.Main(System.String[])
+JITTED Code Address: 00007ffb47df0ab0
+```              
+
+</figure>
 
 Вы можете использовать команду !U 00007ffb47df0ab0, чтобы увидеть сгенерированный ассемблерный код, и результаты представлены в [листинге 4-3](<#l-4-3>). Вот основные шаги выполнения, соответствующие вызову Console.WriteLine:
 

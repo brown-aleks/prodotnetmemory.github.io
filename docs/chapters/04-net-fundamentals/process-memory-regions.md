@@ -91,15 +91,21 @@ description: Основы .NET
 __Примечание
 
 Эти кучи по умолчанию небольшие, порядка одной страницы – обычно около 64 КиБ. Мы можем увидеть это в определениях размеров по умолчанию для .NET Core.
-    
-    
-    #define LOW_FREQUENCY_HEAP_RESERVE_SIZE     (3 * GetOsPageSize())
-    #define LOW_FREQUENCY_HEAP_COMMIT_SIZE      (1 * GetOsPageSize())
-    #define HIGH_FREQUENCY_HEAP_RESERVE_SIZE    (10 * GetOsPageSize())
-    #define HIGH_FREQUENCY_HEAP_COMMIT_SIZE     (1 * GetOsPageSize())
-    #define STUB_HEAP_RESERVE_SIZE              (3 * GetOsPageSize())
-    #define STUB_HEAP_COMMIT_SIZE               (1 * GetOsPageSize())
-    
+
+<figure class="custom-code-wrapper"
+        markdown="1">
+
+``` csharp title="example.cs"
+#define LOW_FREQUENCY_HEAP_RESERVE_SIZE     (3 * GetOsPageSize())
+#define LOW_FREQUENCY_HEAP_COMMIT_SIZE      (1 * GetOsPageSize())
+#define HIGH_FREQUENCY_HEAP_RESERVE_SIZE    (10 * GetOsPageSize())
+#define HIGH_FREQUENCY_HEAP_COMMIT_SIZE     (1 * GetOsPageSize())
+#define STUB_HEAP_RESERVE_SIZE              (3 * GetOsPageSize())
+#define STUB_HEAP_COMMIT_SIZE               (1 * GetOsPageSize())
+```
+   
+   <figcaption>Размеры по умолчанию для Loader Heaps в .NET Core</figcaption>
+</figure>
 
 Помните, что любой тип, загруженный в область кучи загрузчика, не будет выгружен до тех пор, пока не будет выгружен весь соответствующий Appdomain. Если вы постоянно загружаете множество типов (например, динамически загружаете или создаете сборки), вы можете столкнуться с большим использованием памяти. Более того, стандартный Appdomain не будет выгружен до тех пор, пока программа не завершит свою работу.
 
